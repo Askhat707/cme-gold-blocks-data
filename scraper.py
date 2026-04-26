@@ -131,9 +131,7 @@ def wait_for_table(driver, timeout=TABLE_WAIT_TIMEOUT):
 
 # ========== ПАРСИНГ ДАТЫ ==========
 def parse_trade_date(driver):
-    """Извлекает дату из <span class='button-text'>Friday, 24 Apr 2026</span>"""
     try:
-        # Ищем все span с классом button-text
         spans = driver.find_elements(By.CSS_SELECTOR, "span.button-text")
         for span in spans:
             text = span.text.strip()
@@ -143,7 +141,6 @@ def parse_trade_date(driver):
                 return date_obj.strftime("%Y-%m-%d")
     except:
         pass
-    # fallback: пробуем извлечь из URL
     try:
         current_url = driver.current_url
         m = re.search(r'tradeDate=(\d{4}-\d{2}-\d{2})', current_url)
@@ -174,7 +171,7 @@ def generate_trade_id(trade_date, time_utc5, trade_type, legs):
     raw = f"{trade_date}|{time_utc5}|{trade_type}|{sorted_legs}"
     return hashlib.md5(raw.encode()).hexdigest()[:12]
 
-# ========== ПАРСИНГ ТАБЛИЦЫ С УЧЁТОМ ROWSPAN ==========
+# ========== ПАРСИНГ ТАБЛИЦЫ (возвращена оригинальная надёжная логика) ==========
 def parse_all_gold_options(driver):
     trade_date = parse_trade_date(driver)
     records = []
@@ -185,12 +182,11 @@ def parse_all_gold_options(driver):
         print("Таблица не найдена")
         return records
 
-    # Получаем все строки таблицы (включая скрытые/inner rows, но те, что имеют td)
-    rows = table.find_elements(By.CSS_SELECTOR, "tr")
+    rows = table.find_elements(By.TAG_NAME, "tr")
     current_time = None
     current_type = None
     current_group_legs = []
-    trades = []
+    trades = []  # список групп (группа – список легсов с общим временем/типом)
 
     for row in rows:
         cells = [c.text.strip() for c in row.find_elements(By.TAG_NAME, "td")]
@@ -198,33 +194,25 @@ def parse_all_gold_options(driver):
             continue
 
         # Определяем, содержит ли первая ячейка время (формат ЧЧ:ММ:СС AM/PM)
-        # но только если строка НЕ начинается с продукта (т.е. имеет rowspan и содержит время)
-        # На самом деле rowspan скрывает время для последующих строк, но они присутствуют в HTML как пустые.
-        # Поэтому используем другой подход: анализируем наличие атрибута 'rowspan' у ячейки времени.
-        # Проще: будем искать ячейку с классом date-time, содержащую время.
-        time_cell = row.find_element(By.CSS_SELECTOR, "td.date-time")
-        if time_cell:
-            time_text = time_cell.text.strip()
-            if re.match(r'^\d{1,2}:\d{2}:\d{2}\s*[AP]M$', time_text):
-                # Сохраняем предыдущую группу
-                if current_group_legs:
-                    trades.append({
-                        "time": current_time,
-                        "type": current_type,
-                        "legs": current_group_legs
-                    })
-                # Начинаем новую группу
-                current_time = convert_time_to_utc5(time_text, trade_date)
-                # Тип находится в следующей ячейке с rowspan (class text-center)
-                type_cell = row.find_element(By.CSS_SELECTOR, "td.text-center")
-                current_type = type_cell.text.strip() if type_cell else ""
-                current_group_legs = []
-                # Парсим первую строку новой группы
-                leg = parse_leg_row(cells, is_header=True)
-                if leg:
-                    current_group_legs.append(leg)
+        time_match = re.match(r'^\d{1,2}:\d{2}:\d{2}\s*[AP]M$', cells[0])
+        if time_match:
+            # Сохраняем предыдущую группу, если она есть
+            if current_group_legs:
+                trades.append({
+                    "time": current_time,
+                    "type": current_type,
+                    "legs": current_group_legs
+                })
+            # Начинаем новую группу
+            current_time = convert_time_to_utc5(cells[0], trade_date)
+            current_type = cells[1] if len(cells) > 1 else ""
+            current_group_legs = []
+            # Парсим первую строку новой группы (содержит время и тип)
+            leg = parse_leg_row(cells, is_header=True)
+            if leg:
+                current_group_legs.append(leg)
         else:
-            # Нет времени — это дополнительная строка той же группы
+            # Строка без времени – добавляем в текущую группу
             leg = parse_leg_row(cells, is_header=False)
             if leg:
                 current_group_legs.append(leg)
@@ -243,6 +231,7 @@ def parse_all_gold_options(driver):
             continue
         trade_id = generate_trade_id(trade_date, trade["time"], trade["type"], trade["legs"])
         for leg in trade["legs"]:
+            # Вычисляем безубыток только для опционов
             breakeven = 0.0
             if leg["option_type"] in ("call", "put"):
                 try:
@@ -274,14 +263,14 @@ def parse_all_gold_options(driver):
 def parse_leg_row(cells, is_header):
     try:
         if is_header:
-            # Индексы: 0-time (rowspan),1-type(rowspan),2-product,3-sym,4-net_price,5-qty,6-C/P&strike,7-B/S,8-price
+            # Индексы: 0-time,1-type,2-product,3-sym,4-net_price,5-qty,6-C/P&strike,7-B/S,8-price
             if len(cells) < 9:
                 return None
             product = cells[2]
             symbol = cells[3]
             qty_str = cells[5]
-            strike_str = cells[6]
-            b_s = cells[7].capitalize()
+            strike_str = cells[6]  # например, C4850.00 или пусто
+            b_s = cells[7].capitalize()  # Buy/Sell
             price_str = cells[8]
         else:
             # Индексы: 0-product,1-sym,2-net_price,3-qty,4-C/P&strike,5-B/S,6-price
@@ -297,6 +286,7 @@ def parse_leg_row(cells, is_header):
         quantity = int(qty_str) if qty_str.isdigit() else 1
         price = float(price_str) if re.match(r'^-?\d+(\.\d+)?$', price_str) else 0.0
 
+        # Определяем тип ножки: опцион или фьючерс
         product_lower = product.lower()
         if "futures" in product_lower:
             option_type = "futures"
@@ -307,7 +297,7 @@ def parse_leg_row(cells, is_header):
             if strike_str and (strike_str[0] in ('C', 'P')):
                 option_type = "call" if strike_str[0] == 'C' else "put"
             else:
-                # Если нет страйка и это не фьючерс, то всё равно считаем фьючерсом (например, Silver Futures)
+                # Если нет страйка и это не фьючерс, всё равно считаем фьючерсом (например, Silver Futures)
                 option_type = "futures"
                 strike = ""
 
