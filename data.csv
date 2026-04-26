@@ -11,7 +11,6 @@ d3dfa0dec70f,,10:56:00 AM,Spread,Gold Option,OGU6,call,C5300.00,Buy,93.3,210,539
 2dd7825b97ec,,10:49:06 AM,Strip,Gold Option,OGQ6,put,P4400.00,Buy,86.0,39,4314.0
 12d91d1422bb,,10:49:06 AM,Spread,Gold Option,OGQ6,call,C5175.00,Buy,84.0,39,5259.0
 2dd7825b97ec,,10:49:06 AM,Strip,Gold Option,OGQ6,put,P4400.00,Buy,86.0,26,4314.0
-2dd7825b97ec,,10:49:06 AM,Strip,Gold Option,OGQ6,put,P4400.00,Buy,86.0,39,4314.0
 fb31c4955599,,10:30:33 AM,Spread,Gold Option,OGM6,call,C4850.00,Buy,75.0,150,4925.0
 2d5afeb04693,,10:10:49 AM,Strip,Gold Option,OGQ6,put,P4400.00,Buy,86.0,39,4314.0
 ecd17abdc5b0,,10:10:49 AM,Spread,Gold Option,OGQ6,call,C5175.00,Buy,84.0,65,5259.0
@@ -42,6 +41,55 @@ a4aac676456b,,07:01:52 AM,Spread,Gold Option,OGK6,put,P4700.00,Buy,26.3,50,4673.
 2059ed2950c2,,05:12:48 AM,Strip,Gold Option,OGK6,put,P4400.00,Buy,2.2,30,4397.8
 424c3bc8de6f,,05:00:14 AM,Spread,Gold Option,OGN6,call,C5000.00,Sell,80.5,250,5080.5
 1854148c410f,,04:42:22 AM,Strip,Gold Option,OGG7,put,P4200.00,Buy,141.8,25,4058.2
+227dcbc42f79,,03:41:52 AM,Spread,Gold Option,OGZ8,call,C5750.00,Buy,537.0,50,6287.0
+8c457be64b42,,03:08:19 AM,Strip,Gold Option,OGK6,call,C4700.00,Buy,40.9,125,4740.9
+8c457be64b42,,03:08:19 AM,Strip,Gold Option,OGK6,call,C4700.00,Buy,40.9,25,4740.9
+8c457be64b42,,03:08:19 AM,Strip,Gold Option,OGK6,call,C4700.00,Buy,40.9,50,4740.9
+a5a686dd809e,,02:45:47 AM,Spread,Gold Option,OGK6,put,P4700.00,Buy,38.5,150,4661.5
+44ac9a7c7446,,02:35:49 AM,Spread,Gold Option,OGK6,put,P4600.00,Sell,12.8,30,4587.2
+7aaed735e480,,05:19:34 PM,Spread,Gold Weekly Friday Option - Week 1,OG1K6,put,P4600.00,Buy,34.5,50,4565.5
+ec179044ba83,,05:11:55 PM,Spread,Gold Option,OGK6,put,P4625.00,Buy,17.4,60,4607.6
+2abd904e6714,,01:14:22 PM,Strip,Gold Option,OGM6,call,C4850.00,Buy,75.0,50,4925.0
+00298821d625,,01:06:34 PM,Strip,Gold Option,OGM6,call,C4850.00,Buy,75.0,200,4925.0
+00298821d625,,01:06:34 PM,Strip,Gold Option,OGM6,call,C4850.00,Buy,75.0,100,4925.0
+d7ad165b34f2,,11:17:26 AM,Spread,Gold Weekly Friday Option - Week 1,OG1K6,put,P4700.00,Buy,44.5,130,4655.5
+3dc8b0d33c19,,11:09:54 AM,Spread,Gold Option,OGM6,put,P4625.00,Buy,79.5,100,4545.5
+efcf2b1b7b1f,,11:06:40 AM,Strip,Gold Option,OGZ6,put,P4365.00,Buy,150.0,65,4215.0
+9d22e4c0d537,,11:06:40 AM,Spread,Gold Option,OGZ6,call,C5570.00,Buy,124.0,130,5694.0
+d3dfa0dec70f,,10:56:00 AM,Spread,Gold Option,OGU6,call,C5300.00,Buy,93.3,210,5393.3
+12d91d1422bb,,10:49:06 AM,Spread,Gold Option,OGQ6,call,C5175.00,Buy,84.0,78,5259.0
+2dd7825b97ec,,10:49:06 AM,Strip,Gold Option,OGQ6,put,P4400.00,Buy,86.0,39,4314.0
+12d91d1422bb,,10:49:06 AM,Spread,Gold Option,OGQ6,call,C5175.00,Buy,84.0,39,5259.0
+2dd7825b97ec,,10:49:06 AM,Strip,Gold Option,OGQ6,put,P4400.00,Buy,86.0,26,4314.0
+fb31c4955599,,10:30:33 AM,Spread,Gold Option,OGM6,call,C4850.00,Buy,75.0,150,4925.0
+2d5afeb04693,,10:10:49 AM,Strip,Gold Option,OGQ6,put,P4400.00,Buy,86.0,39,4314.0
+ecd17abdc5b0,,10:10:49 AM,Spread,Gold Option,OGQ6,call,C5175.00,Buy,84.0,65,5259.0
+14190daf6444,,09:52:37 AM,Spread,Gold Option,OGK6,call,C4800.00,Buy,11.5,34,4811.5
+665c41f66f45,,09:52:11 AM,Spread,Gold Option,OGK6,call,C4800.00,Buy,11.5,86,4811.5
+6dc3951b2730,,09:43:48 AM,Spread,Gold Option,OGQ6,call,C5150.00,Buy,90.5,50,5240.5
+e1f9eef8765d,,09:23:44 AM,Spread,Silver Option,SON6,call,C90.00,Sell,2.35,20,92.35
+816d733c664e,,09:23:35 AM,Spread,Silver Option,SON6,call,C90.00,Sell,2.35,100,92.35
+f184a05e608f,,09:23:17 AM,Spread,Silver Option,SON6,call,C90.00,Sell,2.35,25,92.35
+fea8b1178bcd,,09:18:53 AM,Strip,Silver Option,SOK6,put,P76.00,Buy,1.15,25,74.85
+b312edb461a3,,08:52:57 AM,Spread,Silver Weekly Tuesday Option - Week 1,S1TK6,put,P77.00,Buy,3.0,25,74.0
+930b34bbdb1a,,08:52:45 AM,Spread,Silver Weekly Tuesday Option - Week 1,S1TK6,put,P77.00,Buy,3.0,20,74.0
+0683ec4ae49e,,08:52:20 AM,Spread,Silver Weekly Tuesday Option - Week 1,S1TK6,put,P77.00,Buy,3.0,30,74.0
+7a2f7dc46795,,08:41:00 AM,Spread,Gold Option,OGK6,put,P4700.00,Buy,30.3,60,4669.7
+82be504afedb,,08:34:32 AM,Strip,Gold Option,OGV6,put,P4100.00,Buy,71.4,25,4028.6
+8dd54fe838c1,,08:34:32 AM,Spread,Gold Option,OGV6,call,C5700.00,Sell,61.8,125,5761.8
+7ae4bc58f81e,,08:23:20 AM,Spread,Gold Option,OGK6,put,P4700.00,Buy,25.9,50,4674.1
+43314cdbc4a6,,08:16:22 AM,Spread,Gold Option,OGZ6,call,C6000.00,Buy,68.5,250,6068.5
+de78f7131488,,08:14:57 AM,Spread,Gold Weekly Tuesday Option - Week 4,G4TJ6,call,C4725.00,Buy,39.3,40,4764.3
+89d6481507a5,,08:14:43 AM,Spread,Gold Weekly Tuesday Option - Week 4,G4TJ6,call,C4725.00,Buy,39.3,15,4764.3
+290c77b7aec0,,08:14:24 AM,Spread,Gold Weekly Tuesday Option - Week 4,G4TJ6,call,C4725.00,Buy,39.3,20,4764.3
+bc9bff81e6c3,,07:07:53 AM,Spread,Silver Option,SOK6,call,C77.00,Sell,0.74,36,77.74
+36eb09846423,,07:07:26 AM,Spread,Silver Option,SOK6,call,C77.00,Sell,0.74,60,77.74
+e2c79edf366d,,07:07:12 AM,Spread,Silver Option,SOK6,call,C77.00,Sell,0.74,24,77.74
+a4aac676456b,,07:01:52 AM,Spread,Gold Option,OGK6,put,P4700.00,Buy,26.3,50,4673.7
+7b49ad0bed2d,,07:01:06 AM,Spread,Gold Option,OGK6,put,P4700.00,Buy,26.3,50,4673.7
+1581cc604ae8,,06:31:49 AM,Option,Silver Option,SOK6,call,C78.00,,0.55,50,78.55
+2059ed2950c2,,05:12:48 AM,Strip,Gold Option,OGK6,put,P4400.00,Buy,2.2,30,4397.8
+424c3bc8de6f,,05:00:14 AM,Spread,Gold Option,OGN6,call,C5000.00,Sell,80.5,250,5080.5
 1854148c410f,,04:42:22 AM,Strip,Gold Option,OGG7,put,P4200.00,Buy,141.8,25,4058.2
 227dcbc42f79,,03:41:52 AM,Spread,Gold Option,OGZ8,call,C5750.00,Buy,537.0,50,6287.0
 8c457be64b42,,03:08:19 AM,Strip,Gold Option,OGK6,call,C4700.00,Buy,40.9,125,4740.9
