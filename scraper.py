@@ -1,5 +1,5 @@
 # scraper.py
-import os, time, hashlib, pickle, re
+import os, time, hashlib, re
 from datetime import datetime
 import pandas as pd
 import pytz
@@ -19,10 +19,8 @@ URL = (
     "#tradeDate=2025-08-22&subGroups=35&exchanges=COMEX&foi=O"
 )
 TABLE_WAIT_TIMEOUT = 45
-SESSION_FILE = "cme_session.pkl"
 CSV_FILE = "data.csv"
 
-# Часовые пояса
 CT_TZ = pytz.timezone("US/Central")
 TARGET_TZ = pytz.timezone("Asia/Almaty")  # UTC+5
 
@@ -68,70 +66,8 @@ def create_driver():
     })
     return driver
 
-def load_session(driver):
-    if not os.path.exists(SESSION_FILE):
-        return False
-    with open(SESSION_FILE, "rb") as f:
-        session = pickle.load(f)
-    cookies = session.get("cookies", [])
-    cdp_cookies = []
-    for c in cookies:
-        cdp_cookie = {
-            'name': c.get('name'),
-            'value': c.get('value'),
-            'domain': c.get('domain'),
-            'path': c.get('path', '/'),
-            'secure': c.get('secure', False),
-            'httpOnly': c.get('httpOnly', False),
-        }
-        if 'expiry' in c and c['expiry']:
-            cdp_cookie['expires'] = c['expiry']
-        cdp_cookies.append(cdp_cookie)
-    try:
-        driver.execute_cdp_cmd('Storage.setCookies', {'cookies': cdp_cookies})
-    except:
-        for c in cookies:
-            try:
-                driver.add_cookie(c)
-            except:
-                pass
-    driver.refresh()
-    time.sleep(2)
-    local_storage_str = session.get("local_storage", "{}")
-    session_storage_str = session.get("session_storage", "{}")
-    driver.execute_script("""
-        const ls = arguments[0];
-        const ss = arguments[1];
-        try {
-            const localObj = JSON.parse(ls);
-            Object.keys(localObj).forEach(key => {
-                window.localStorage.setItem(key, localObj[key]);
-            });
-            const sessionObj = JSON.parse(ss);
-            Object.keys(sessionObj).forEach(key => {
-                window.sessionStorage.setItem(key, sessionObj[key]);
-            });
-        } catch(e) { console.error(e); }
-    """, local_storage_str, session_storage_str)
-    driver.refresh()
-    time.sleep(5)
-    return True
-
-def wait_for_table(driver, timeout=TABLE_WAIT_TIMEOUT):
-    for attempt in range(3):
-        try:
-            WebDriverWait(driver, timeout).until(
-                EC.presence_of_element_located((By.CSS_SELECTOR, "table.block-trades-table"))
-            )
-            time.sleep(2)
-            return True
-        except TimeoutException:
-            driver.refresh()
-    return False
-
 # ========== ПАРСИНГ ДАТЫ ==========
 def parse_trade_date(driver):
-    """Извлекает дату из <span class='button-text'>Friday, 24 Apr 2026</span>"""
     try:
         span = driver.find_element(By.CSS_SELECTOR, "span.button-text")
         text = span.text.strip()
@@ -141,33 +77,23 @@ def parse_trade_date(driver):
             return date_obj.strftime("%Y-%m-%d")
     except:
         pass
-    # fallback: если дату не удалось извлечь – возвращаем пустую строку
     return ""
 
 # ========== КОНВЕРТАЦИЯ ВРЕМЕНИ CT -> UTC+5 ==========
 def convert_time_to_utc5(time_str, trade_date_str):
-    """
-    time_str: '01:14:22 PM'
-    trade_date_str: '2026-04-24'
-    возвращает время в UTC+5 как строку HH:MM:SS
-    """
+    if not trade_date_str:
+        return time_str
     try:
-        if not trade_date_str:
-            return time_str  # без даты конвертация невозможна
         dt_naive = datetime.strptime(time_str, "%I:%M:%S %p")
         trade_date = datetime.strptime(trade_date_str, "%Y-%m-%d").date()
         ct_time = CT_TZ.localize(datetime.combine(trade_date, dt_naive.time()))
         target_time = ct_time.astimezone(TARGET_TZ)
         return target_time.strftime("%H:%M:%S")
     except:
-        return time_str  # при ошибке возвращаем исходную строку
+        return time_str
 
 # ========== ГЕНЕРАЦИЯ УНИКАЛЬНОГО TRADE ID ==========
 def generate_trade_id(trade_date, time_utc5, trade_type, legs):
-    """
-    legs - список словарей с полями symbol, strike, position
-    Создаёт MD5-хэш от сортированного представления всех ног.
-    """
     sorted_legs = sorted(
         [(lg.get("symbol",""), lg.get("strike",""), lg.get("position","")) for lg in legs]
     )
@@ -189,38 +115,32 @@ def parse_all_gold_options(driver):
     current_time = None
     current_type = None
     current_group_legs = []
-    trades = []  # список групп (группа – список легсов с общим временем/типом)
+    trades = []
 
     for row in rows:
         cells = [c.text.strip() for c in row.find_elements(By.TAG_NAME, "td")]
         if not cells:
             continue
 
-        # Определяем, содержит ли первая ячейка время (формат ЧЧ:ММ:СС AM/PM)
         time_match = re.match(r'^\d{1,2}:\d{2}:\d{2}\s*[AP]M$', cells[0])
         if time_match:
-            # Сохраняем предыдущую группу, если она есть
             if current_group_legs:
                 trades.append({
                     "time": current_time,
                     "type": current_type,
                     "legs": current_group_legs
                 })
-            # Начинаем новую группу
             current_time = convert_time_to_utc5(cells[0], trade_date)
             current_type = cells[1] if len(cells) > 1 else ""
             current_group_legs = []
-            # Парсим первую строку новой группы (содержит время и тип)
             leg = parse_leg_row(cells, is_header=True)
             if leg:
                 current_group_legs.append(leg)
         else:
-            # Строка без времени – добавляем в текущую группу
             leg = parse_leg_row(cells, is_header=False)
             if leg:
                 current_group_legs.append(leg)
 
-    # Не забываем последнюю группу
     if current_group_legs:
         trades.append({
             "time": current_time,
@@ -228,17 +148,14 @@ def parse_all_gold_options(driver):
             "legs": current_group_legs
         })
 
-    # Обрабатываем каждую группу
     for trade in trades:
         if not trade["legs"]:
             continue
         trade_id = generate_trade_id(trade_date, trade["time"], trade["type"], trade["legs"])
         for leg in trade["legs"]:
-            # Вычисляем безубыток только для опционов
             breakeven = 0.0
             if leg["option_type"] in ("call", "put"):
                 try:
-                    # strike: 'C4850.00' -> 4850.0
                     strike_val = float(leg["strike"][1:])
                     premium = float(leg["price"])
                     if leg["option_type"] == "call":
@@ -258,30 +175,24 @@ def parse_all_gold_options(driver):
                 "option_type": leg.get("option_type", ""),
                 "strike": leg.get("strike", ""),
                 "position": leg.get("position", ""),
-                "price": leg.get("price", 0.0),
                 "quantity": leg.get("quantity", 1),
-                "breakeven": breakeven
+                "breakeven": breakeven,
+                "price": leg.get("price", 0.0)
             })
     return records
 
 def parse_leg_row(cells, is_header):
-    """
-    Извлекает данные одной строки таблицы (ножки сделки).
-    Возвращает словарь: product_name, symbol, option_type, strike, position, price, quantity.
-    """
     try:
         if is_header:
-            # Индексы: 0-time,1-type,2-product,3-sym,4-net_price,5-qty,6-C/P&strike,7-B/S,8-price
             if len(cells) < 9:
                 return None
             product = cells[2]
             symbol = cells[3]
             qty_str = cells[5]
-            strike_str = cells[6]  # например, C4850.00 или пусто
-            b_s = cells[7].capitalize()  # Buy/Sell
+            strike_str = cells[6]
+            b_s = cells[7].capitalize()
             price_str = cells[8]
         else:
-            # Индексы: 0-product,1-sym,2-net_price,3-qty,4-C/P&strike,5-B/S,6-price
             if len(cells) < 7:
                 return None
             product = cells[0]
@@ -294,15 +205,16 @@ def parse_leg_row(cells, is_header):
         quantity = int(qty_str) if qty_str.isdigit() else 1
         price = float(price_str) if re.match(r'^-?\d+(\.\d+)?$', price_str) else 0.0
 
-        # Определяем тип ножки: опцион или фьючерс
-        option_type = ""
-        strike = strike_str
-        if strike_str and (strike_str[0] in ('C', 'P')):
-            option_type = "call" if strike_str[0] == 'C' else "put"
-        else:
-            # Фьючерс – нет страйка
+        # Определяем тип ножки
+        product_lower = product.lower()
+        if "futures" in product_lower:
             option_type = "futures"
             strike = ""
+        else:
+            option_type = ""
+            strike = strike_str
+            if strike_str and strike_str[0] in ('C', 'P'):
+                option_type = "call" if strike_str[0] == 'C' else "put"
 
         return {
             "product_name": product,
@@ -316,6 +228,18 @@ def parse_leg_row(cells, is_header):
     except (ValueError, IndexError):
         return None
 
+def wait_for_table(driver, timeout=TABLE_WAIT_TIMEOUT):
+    for attempt in range(3):
+        try:
+            WebDriverWait(driver, timeout).until(
+                EC.presence_of_element_located((By.CSS_SELECTOR, "table.block-trades-table"))
+            )
+            time.sleep(2)
+            return True
+        except TimeoutException:
+            driver.refresh()
+    return False
+
 # ========== ГЛАВНАЯ ФУНКЦИЯ ==========
 def main():
     print("Запуск скрейпера CME Block Trades...")
@@ -323,7 +247,6 @@ def main():
     try:
         driver.get(URL)
         time.sleep(5)
-        # Принять куки, если есть
         try:
             btn = WebDriverWait(driver, 5).until(
                 EC.element_to_be_clickable((By.ID, "onetrust-accept-btn-handler"))
@@ -332,42 +255,26 @@ def main():
         except:
             pass
 
-        if load_session(driver):
-            print("Сессия загружена")
-        else:
-            print("Файл сессии отсутствует, продолжаем без него...")
-
         if not wait_for_table(driver):
             print("Таблица не найдена")
             return
 
         records = parse_all_gold_options(driver)
         if records:
-            df_new = pd.DataFrame(records)
-            # Фиксированный порядок колонок для совместимости с MQL5
+            df = pd.DataFrame(records)
+            # Фиксированный порядок колонок
             cols_order = [
                 "trade_id", "trade_date", "time_utc5", "type", "product_name",
-                "symbol", "option_type", "strike", "position", "price",
-                "quantity", "breakeven"
+                "symbol", "option_type", "strike", "position", "quantity",
+                "breakeven", "price"
             ]
-            df_new = df_new[cols_order]
-
-            if os.path.exists(CSV_FILE):
-                df_existing = pd.read_csv(CSV_FILE, dtype=str)
-                # Защита от пустых колонок (если старый файл имел другой формат)
-                for col in cols_order:
-                    if col not in df_existing.columns:
-                        df_existing[col] = ""
-                df_existing = df_existing[cols_order]
-                df_merged = pd.concat([df_existing, df_new], ignore_index=True)
-                # Дедупликация: сохраняем первую запись (уже существующую) и отклоняем дубликаты
-                dedup_keys = ["trade_id", "time_utc5", "symbol", "strike", "position", "quantity"]
-                df_merged.drop_duplicates(subset=dedup_keys, keep='first', inplace=True)
-                df_merged.to_csv(CSV_FILE, index=False)
-                print(f"Сохранено {len(records)} записей, всего в файле {len(df_merged)} строк")
-            else:
-                df_new.to_csv(CSV_FILE, index=False)
-                print(f"Файл создан, сохранено {len(records)} записей")
+            df = df[cols_order]
+            # Удаление полных дубликатов по ключевым полям
+            df.drop_duplicates(subset=["trade_id", "symbol", "position"], inplace=True)
+            # Сортировка по убыванию времени
+            df.sort_values(by=["time_utc5"], ascending=False, inplace=True)
+            df.to_csv(CSV_FILE, index=False)
+            print(f"Файл перезаписан, сохранено {len(df)} записей")
         else:
             print("Нет данных для сохранения")
     finally:
