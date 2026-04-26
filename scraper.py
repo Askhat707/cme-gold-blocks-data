@@ -1,5 +1,5 @@
 # scraper.py
-import os, time, hashlib, re
+import os, time, hashlib, pickle, re
 from datetime import datetime
 import pandas as pd
 import pytz
@@ -19,8 +19,10 @@ URL = (
     "#tradeDate=2025-08-22&subGroups=35&exchanges=COMEX&foi=O"
 )
 TABLE_WAIT_TIMEOUT = 45
+SESSION_FILE = "cme_session.pkl"
 CSV_FILE = "data.csv"
 
+# Часовые пояса
 CT_TZ = pytz.timezone("US/Central")
 TARGET_TZ = pytz.timezone("Asia/Almaty")  # UTC+5
 
@@ -66,15 +68,87 @@ def create_driver():
     })
     return driver
 
+def load_session(driver):
+    if not os.path.exists(SESSION_FILE):
+        return False
+    with open(SESSION_FILE, "rb") as f:
+        session = pickle.load(f)
+    cookies = session.get("cookies", [])
+    cdp_cookies = []
+    for c in cookies:
+        cdp_cookie = {
+            'name': c.get('name'),
+            'value': c.get('value'),
+            'domain': c.get('domain'),
+            'path': c.get('path', '/'),
+            'secure': c.get('secure', False),
+            'httpOnly': c.get('httpOnly', False),
+        }
+        if 'expiry' in c and c['expiry']:
+            cdp_cookie['expires'] = c['expiry']
+        cdp_cookies.append(cdp_cookie)
+    try:
+        driver.execute_cdp_cmd('Storage.setCookies', {'cookies': cdp_cookies})
+    except:
+        for c in cookies:
+            try:
+                driver.add_cookie(c)
+            except:
+                pass
+    driver.refresh()
+    time.sleep(2)
+    local_storage_str = session.get("local_storage", "{}")
+    session_storage_str = session.get("session_storage", "{}")
+    driver.execute_script("""
+        const ls = arguments[0];
+        const ss = arguments[1];
+        try {
+            const localObj = JSON.parse(ls);
+            Object.keys(localObj).forEach(key => {
+                window.localStorage.setItem(key, localObj[key]);
+            });
+            const sessionObj = JSON.parse(ss);
+            Object.keys(sessionObj).forEach(key => {
+                window.sessionStorage.setItem(key, sessionObj[key]);
+            });
+        } catch(e) { console.error(e); }
+    """, local_storage_str, session_storage_str)
+    driver.refresh()
+    time.sleep(5)
+    return True
+
+def wait_for_table(driver, timeout=TABLE_WAIT_TIMEOUT):
+    for attempt in range(3):
+        try:
+            WebDriverWait(driver, timeout).until(
+                EC.presence_of_element_located((By.CSS_SELECTOR, "table.block-trades-table"))
+            )
+            time.sleep(2)
+            return True
+        except TimeoutException:
+            driver.refresh()
+    return False
+
 # ========== ПАРСИНГ ДАТЫ ==========
 def parse_trade_date(driver):
+    """Извлекает дату, показанную в span.button-text (напр. Friday, 24 Apr 2026)"""
     try:
-        span = driver.find_element(By.CSS_SELECTOR, "span.button-text")
-        text = span.text.strip()
-        match = re.search(r'\d{1,2}\s+\w{3}\s+\d{4}', text)
-        if match:
-            date_obj = datetime.strptime(match.group(), "%d %b %Y")
-            return date_obj.strftime("%Y-%m-%d")
+        # Ищем все span с классом button-text
+        spans = driver.find_elements(By.CSS_SELECTOR, "span.button-text")
+        for span in spans:
+            text = span.text.strip()
+            match = re.search(r'\d{1,2}\s+\w{3}\s+\d{4}', text)
+            if match:
+                date_obj = datetime.strptime(match.group(), "%d %b %Y")
+                return date_obj.strftime("%Y-%m-%d")
+    except:
+        pass
+    # fallback: пробуем извлечь из URL
+    try:
+        current_url = driver.current_url
+        m = re.search(r'tradeDate=(\d{4}-\d{2}-\d{2})', current_url)
+        if m:
+            return m.group(1)
     except:
         pass
     return ""
@@ -175,9 +249,9 @@ def parse_all_gold_options(driver):
                 "option_type": leg.get("option_type", ""),
                 "strike": leg.get("strike", ""),
                 "position": leg.get("position", ""),
+                "price": leg.get("price", 0.0),
                 "quantity": leg.get("quantity", 1),
-                "breakeven": breakeven,
-                "price": leg.get("price", 0.0)
+                "breakeven": breakeven
             })
     return records
 
@@ -205,7 +279,6 @@ def parse_leg_row(cells, is_header):
         quantity = int(qty_str) if qty_str.isdigit() else 1
         price = float(price_str) if re.match(r'^-?\d+(\.\d+)?$', price_str) else 0.0
 
-        # Определяем тип ножки
         product_lower = product.lower()
         if "futures" in product_lower:
             option_type = "futures"
@@ -228,18 +301,6 @@ def parse_leg_row(cells, is_header):
     except (ValueError, IndexError):
         return None
 
-def wait_for_table(driver, timeout=TABLE_WAIT_TIMEOUT):
-    for attempt in range(3):
-        try:
-            WebDriverWait(driver, timeout).until(
-                EC.presence_of_element_located((By.CSS_SELECTOR, "table.block-trades-table"))
-            )
-            time.sleep(2)
-            return True
-        except TimeoutException:
-            driver.refresh()
-    return False
-
 # ========== ГЛАВНАЯ ФУНКЦИЯ ==========
 def main():
     print("Запуск скрейпера CME Block Trades...")
@@ -255,6 +316,11 @@ def main():
         except:
             pass
 
+        if load_session(driver):
+            print("Сессия загружена")
+        else:
+            print("Файл сессии отсутствует, продолжаем без него...")
+
         if not wait_for_table(driver):
             print("Таблица не найдена")
             return
@@ -262,16 +328,13 @@ def main():
         records = parse_all_gold_options(driver)
         if records:
             df = pd.DataFrame(records)
-            # Фиксированный порядок колонок
             cols_order = [
                 "trade_id", "trade_date", "time_utc5", "type", "product_name",
                 "symbol", "option_type", "strike", "position", "quantity",
                 "breakeven", "price"
             ]
             df = df[cols_order]
-            # Удаление полных дубликатов по ключевым полям
             df.drop_duplicates(subset=["trade_id", "symbol", "position"], inplace=True)
-            # Сортировка по убыванию времени
             df.sort_values(by=["time_utc5"], ascending=False, inplace=True)
             df.to_csv(CSV_FILE, index=False)
             print(f"Файл перезаписан, сохранено {len(df)} записей")
