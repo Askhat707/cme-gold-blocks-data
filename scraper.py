@@ -171,7 +171,7 @@ def generate_trade_id(trade_date, time_utc5, trade_type, legs):
     raw = f"{trade_date}|{time_utc5}|{trade_type}|{sorted_legs}"
     return hashlib.md5(raw.encode()).hexdigest()[:12]
 
-# ========== ПАРСИНГ ТАБЛИЦЫ (возвращена оригинальная надёжная логика) ==========
+# ========== ПАРСИНГ ТАБЛИЦЫ ==========
 def parse_all_gold_options(driver):
     trade_date = parse_trade_date(driver)
     records = []
@@ -186,38 +186,34 @@ def parse_all_gold_options(driver):
     current_time = None
     current_type = None
     current_group_legs = []
-    trades = []  # список групп (группа – список легсов с общим временем/типом)
+    trades = []
 
     for row in rows:
         cells = [c.text.strip() for c in row.find_elements(By.TAG_NAME, "td")]
         if not cells:
             continue
 
-        # Определяем, содержит ли первая ячейка время (формат ЧЧ:ММ:СС AM/PM)
+        # Первая ячейка содержит время?
         time_match = re.match(r'^\d{1,2}:\d{2}:\d{2}\s*[AP]M$', cells[0])
         if time_match:
-            # Сохраняем предыдущую группу, если она есть
             if current_group_legs:
                 trades.append({
                     "time": current_time,
                     "type": current_type,
                     "legs": current_group_legs
                 })
-            # Начинаем новую группу
             current_time = convert_time_to_utc5(cells[0], trade_date)
             current_type = cells[1] if len(cells) > 1 else ""
             current_group_legs = []
-            # Парсим первую строку новой группы (содержит время и тип)
             leg = parse_leg_row(cells, is_header=True)
             if leg:
                 current_group_legs.append(leg)
         else:
-            # Строка без времени – добавляем в текущую группу
+            # Строка без времени – продолжение группы
             leg = parse_leg_row(cells, is_header=False)
             if leg:
                 current_group_legs.append(leg)
 
-    # Не забываем последнюю группу
     if current_group_legs:
         trades.append({
             "time": current_time,
@@ -225,13 +221,11 @@ def parse_all_gold_options(driver):
             "legs": current_group_legs
         })
 
-    # Обрабатываем каждую группу
     for trade in trades:
         if not trade["legs"]:
             continue
         trade_id = generate_trade_id(trade_date, trade["time"], trade["type"], trade["legs"])
         for leg in trade["legs"]:
-            # Вычисляем безубыток только для опционов
             breakeven = 0.0
             if leg["option_type"] in ("call", "put"):
                 try:
@@ -263,30 +257,41 @@ def parse_all_gold_options(driver):
 def parse_leg_row(cells, is_header):
     try:
         if is_header:
-            # Индексы: 0-time,1-type,2-product,3-sym,4-net_price,5-qty,6-C/P&strike,7-B/S,8-price
+            # Ячеек всегда 9: time, type, product, sym, net, qty, strike, bs, price
             if len(cells) < 9:
                 return None
             product = cells[2]
             symbol = cells[3]
-            qty_str = cells[5]
-            strike_str = cells[6]  # например, C4850.00 или пусто
-            b_s = cells[7].capitalize()  # Buy/Sell
+            qty_str = cells[5]          # qty после net-price
+            strike_str = cells[6]
+            b_s = cells[7].capitalize()
             price_str = cells[8]
         else:
-            # Индексы: 0-product,1-sym,2-net_price,3-qty,4-C/P&strike,5-B/S,6-price
-            if len(cells) < 7:
+            # Может быть 6 ячеек (без net-price) или 7 (с net-price)
+            if len(cells) < 6:
                 return None
             product = cells[0]
             symbol = cells[1]
-            qty_str = cells[3]
-            strike_str = cells[4]
-            b_s = cells[5].capitalize()
-            price_str = cells[6]
+            # Определяем, содержит ли cells[2] число (net-price) или это qty
+            possible_net = cells[2].strip()
+            if possible_net and re.match(r'^-?\d+(\.\d+)?$', possible_net):
+                # Есть net-price: cells[2]=net, cells[3]=qty, cells[4]=strike, cells[5]=bs, cells[6]=price
+                if len(cells) < 7:
+                    return None
+                qty_str = cells[3]
+                strike_str = cells[4]
+                b_s = cells[5].capitalize()
+                price_str = cells[6]
+            else:
+                # Нет net-price: cells[2]=qty, cells[3]=strike, cells[4]=bs, cells[5]=price
+                qty_str = cells[2]
+                strike_str = cells[3]
+                b_s = cells[4].capitalize()
+                price_str = cells[5]
 
         quantity = int(qty_str) if qty_str.isdigit() else 1
         price = float(price_str) if re.match(r'^-?\d+(\.\d+)?$', price_str) else 0.0
 
-        # Определяем тип ножки: опцион или фьючерс
         product_lower = product.lower()
         if "futures" in product_lower:
             option_type = "futures"
@@ -297,7 +302,6 @@ def parse_leg_row(cells, is_header):
             if strike_str and (strike_str[0] in ('C', 'P')):
                 option_type = "call" if strike_str[0] == 'C' else "put"
             else:
-                # Если нет страйка и это не фьючерс, всё равно считаем фьючерсом (например, Silver Futures)
                 option_type = "futures"
                 strike = ""
 
