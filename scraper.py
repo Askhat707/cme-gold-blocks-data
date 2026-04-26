@@ -1,5 +1,6 @@
-import os, time, hashlib, pickle
-from datetime import datetime, timezone
+import os, time, hashlib, pickle, re
+from datetime import datetime
+from dateutil import parser as date_parser
 import pandas as pd
 import pytz
 from selenium import webdriver
@@ -11,11 +12,21 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException, NoSuchElementException
 from webdriver_manager.chrome import ChromeDriverManager
 
-URL = "https://www.cmegroup.com/clearing/operations-and-deliveries/accepted-trade-types/block-data.html#tradeDate=2025-08-22&subGroups=35&exchanges=COMEX&foi=O"
+# ========== НАСТРОЙКИ ==========
+URL = (
+    "https://www.cmegroup.com/clearing/operations-and-deliveries/"
+    "accepted-trade-types/block-data.html"
+    "#tradeDate=2025-08-22&subGroups=35&exchanges=COMEX&foi=O"
+)
 TABLE_WAIT_TIMEOUT = 45
-SESSION_FILE = "cme_session.pkl"   # файл должен лежать в корне репозитория
+SESSION_FILE = "cme_session.pkl"
 CSV_FILE = "data.csv"
 
+# Часовые пояса
+CT_TZ = pytz.timezone("US/Central")
+TARGET_TZ = pytz.timezone("Asia/Almaty")  # UTC+5
+
+# ========== ДРАЙВЕР ==========
 def create_driver():
     opts = Options()
     opts.add_argument("--headless=new")
@@ -27,24 +38,22 @@ def create_driver():
     opts.add_argument("--disable-background-networking")
     opts.add_argument("--disable-sync")
     opts.add_argument("--disable-translate")
-    opts.add_argument("--disable-features=TranslateUI,BlinkGenPropertyTrees")
     opts.add_argument("--disable-application-cache")
     opts.add_argument("--disable-client-side-phishing-detection")
     opts.add_argument("--disable-default-apps")
-    opts.add_argument("--disable-hang-monitor")
     opts.add_argument("--disable-popup-blocking")
-    opts.add_argument("--disable-prompt-on-repost")
     opts.add_argument("--disable-logging")
     opts.add_argument("--log-level=3")
     opts.add_argument("--silent")
     opts.add_argument("--disk-cache-size=1")
     opts.add_argument("--media-cache-size=1")
-    opts.add_argument("--js-flags=--max-old-space-size=256")
-    opts.add_argument("--disable-dev-tools")
     opts.add_argument("--disable-blink-features=AutomationControlled")
     opts.add_experimental_option("excludeSwitches", ["enable-automation"])
     opts.add_experimental_option("useAutomationExtension", False)
-    ua = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36"
+    ua = (
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+        "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36"
+    )
     opts.add_argument(f"user-agent={ua}")
 
     service = Service(ChromeDriverManager().install())
@@ -120,88 +129,202 @@ def wait_for_table(driver, timeout=TABLE_WAIT_TIMEOUT):
             driver.refresh()
     return False
 
-def convert_time_to_utc5(ts):
+# ========== ПАРСИНГ ДАТЫ ==========
+def parse_trade_date(driver):
+    """Извлекает дату из <span class='button-text'>Friday, 24 Apr 2026</span> и возвращает YYYY-MM-DD"""
     try:
-        t = datetime.strptime(ts, "%I:%M:%S %p")
-        est = pytz.timezone("US/Eastern")
-        utc5 = pytz.timezone("Asia/Almaty")
-        now_est = datetime.now(est).date()
-        est_time = est.localize(datetime.combine(now_est, t.time()))
-        return est_time.astimezone(utc5).strftime("%H:%M:%S")
+        span = driver.find_element(By.CSS_SELECTOR, "span.button-text")
+        text = span.text.strip()
+        # "Friday, 24 Apr 2026" -> извлекаем часть после запятой
+        match = re.search(r'\d{1,2}\s+\w{3}\s+\d{4}', text)
+        if match:
+            date_obj = datetime.strptime(match.group(), "%d %b %Y")
+            return date_obj.strftime("%Y-%m-%d")
     except:
-        return ts
+        pass
+    # fallback
+    return datetime.now().strftime("%Y-%m-%d")
 
-def parse_all_gold_options(driver):
-    records = []
+# ========== КОНВЕРТАЦИЯ ВРЕМЕНИ CT -> UTC+5 ==========
+def convert_time_to_utc5(time_str, trade_date_str):
+    """
+    time_str: '01:14:22 PM'
+    trade_date_str: '2026-04-24'
+    возвращает время в UTC+5 как строку HH:MM:SS
+    """
     try:
-        trade_date_elem = driver.find_element(By.CSS_SELECTOR, "span.button-text")
-        trade_date = trade_date_elem.text
+        dt_naive = datetime.strptime(time_str, "%I:%M:%S %p")
+        trade_date = datetime.strptime(trade_date_str, "%Y-%m-%d").date()
+        ct_time = CT_TZ.localize(datetime.combine(trade_date, dt_naive.time()))
+        target_time = ct_time.astimezone(TARGET_TZ)
+        return target_time.strftime("%H:%M:%S")
     except:
-        trade_date = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+        return time_str  # если ошибка, вернуть оригинал
+
+# ========== ГЕНЕРАЦИЯ УНИКАЛЬНОГО TRADE ID ==========
+def generate_trade_id(trade_date, time_utc5, trade_type, legs):
+    """
+    legs - список словарей с полями symbol, strike, position
+    Создаёт MD5-хэш от сортированного представления всех ног.
+    """
+    sorted_legs = sorted(
+        [(lg.get("symbol",""), lg.get("strike",""), lg.get("position","")) for lg in legs]
+    )
+    raw = f"{trade_date}|{time_utc5}|{trade_type}|{sorted_legs}"
+    return hashlib.md5(raw.encode()).hexdigest()[:12]
+
+# ========== ПАРСИНГ ТАБЛИЦЫ ==========
+def parse_all_gold_options(driver):
+    trade_date = parse_trade_date(driver)
+    records = []
 
     try:
         table = driver.find_element(By.CSS_SELECTOR, "table.block-trades-table")
     except NoSuchElementException:
+        print("Таблица не найдена")
         return records
-    tbody_elements = table.find_elements(By.TAG_NAME, "tbody")
+
+    rows = table.find_elements(By.TAG_NAME, "tr")
     current_time = None
     current_type = None
-    for tbody in tbody_elements:
-        rows = tbody.find_elements(By.TAG_NAME, "tr")
-        for row in rows:
-            cells = [c.text.strip() for c in row.find_elements(By.TAG_NAME, "td")]
-            if cells and ":" in cells[0] and ("AM" in cells[0] or "PM" in cells[0]):
-                current_time = convert_time_to_utc5(cells[0])
-            for txt in ["Spread", "Strip", "Option"]:
-                if txt in cells:
-                    current_type = txt
-                    break
-            for idx, cell in enumerate(cells):
-                if cell.startswith("OG") and "Futures" not in cells[max(0, idx-1)]:
-                    product = cells[idx-1] if idx>0 else ""
-                    if "Option" not in product:
-                        continue
-                    try:
-                        symbol = cell
-                        quantity = cells[idx+2] if idx+2 < len(cells) else "1"
-                        strike_idx = idx+3
-                        while strike_idx < len(cells) and not cells[strike_idx].startswith(('C','P')):
-                            strike_idx += 1
-                        if strike_idx+2 >= len(cells):
-                            continue
-                        strike = cells[strike_idx]
-                        pos = cells[strike_idx+1].lower()
-                        premium = cells[strike_idx+2]
-                        if not (strike.startswith('C') or strike.startswith('P')):
-                            continue
-                        opt = "call" if strike.startswith('C') else "put"
-                        strike_val = float(strike[1:])
-                        premium_val = float(premium)
-                        be = round(strike_val + premium_val if opt == "call" else strike_val - premium_val, 2)
-                        records.append({
-                            "trade_date": trade_date,
-                            "time_utc5": current_time or "",
-                            "type": current_type or "",
-                            "symbol": symbol,
-                            "strike": strike,
-                            "option_type": opt,
-                            "position": pos,
-                            "premium": premium_val,
-                            "quantity": int(quantity) if quantity.isdigit() else 1,
-                            "breakeven": be,
-                            "scraped_at": datetime.now(timezone.utc).isoformat()
-                        })
-                    except (ValueError, IndexError):
-                        continue
+    current_group_legs = []
+    trades = []  # список групп (группа – список легсов с общим временем/типом)
+
+    for row in rows:
+        cells = [c.text.strip() for c in row.find_elements(By.TAG_NAME, "td")]
+        if not cells:
+            continue
+
+        # Определяем, содержит ли первая ячейка время (формат ЧЧ:ММ:СС AM/PM)
+        time_match = re.match(r'^\d{1,2}:\d{2}:\d{2}\s*[AP]M$', cells[0])
+        if time_match:
+            # Сохраняем предыдущую группу, если она есть
+            if current_group_legs:
+                trades.append({
+                    "time": current_time,
+                    "type": current_type,
+                    "legs": current_group_legs
+                })
+            # Начинаем новую группу
+            current_time = convert_time_to_utc5(cells[0], trade_date)
+            current_type = cells[1] if len(cells) > 1 else ""
+            current_group_legs = []
+            # Теперь парсим оставшиеся колонки для этой строки (если есть)
+            leg = parse_leg_row(cells, is_header=True)
+            if leg:
+                current_group_legs.append(leg)
+        else:
+            # Строка без времени – добавляем в текущую группу
+            leg = parse_leg_row(cells, is_header=False)
+            if leg:
+                current_group_legs.append(leg)
+
+    # Не забываем последнюю группу
+    if current_group_legs:
+        trades.append({
+            "time": current_time,
+            "type": current_type,
+            "legs": current_group_legs
+        })
+
+    # Теперь обрабатываем каждую группу
+    for trade in trades:
+        if not trade["legs"]:
+            continue
+        trade_id = generate_trade_id(trade_date, trade["time"], trade["type"], trade["legs"])
+        for leg in trade["legs"]:
+            # Вычисляем безубыток только для опционов
+            breakeven = 0.0
+            if leg["option_type"] in ("call", "put"):
+                try:
+                    strike_val = float(leg["strike"][1:])  # C4850.00 -> 4850.0
+                    premium = float(leg["price"])
+                    if leg["option_type"] == "call":
+                        breakeven = round(strike_val + premium, 2)
+                    else:
+                        breakeven = round(strike_val - premium, 2)
+                except:
+                    breakeven = 0.0
+
+            records.append({
+                "trade_id": trade_id,
+                "trade_date": trade_date,
+                "time_utc5": trade["time"],
+                "type": trade["type"],
+                "product_name": leg.get("product_name", ""),
+                "symbol": leg.get("symbol", ""),
+                "option_type": leg.get("option_type", ""),
+                "strike": leg.get("strike", ""),
+                "position": leg.get("position", ""),
+                "price": leg.get("price", 0.0),
+                "quantity": leg.get("quantity", 1),
+                "breakeven": breakeven,
+                "scraped_at": datetime.now(pytz.utc).isoformat()
+            })
     return records
 
+def parse_leg_row(cells, is_header):
+    """
+    Извлекает данные одной строки таблицы (ножки сделки) в зависимости от того,
+    присутствуют ли колонки TIME и TYPE (is_header).
+    Возвращает словарь с ключами: product_name, symbol, option_type, strike, position, price, quantity.
+    """
+    try:
+        if is_header:
+            # Индексы: 0-time,1-type,2-product,3-sym,4-net_price,5-qty,6-C/P&strike,7-B/S,8-price
+            if len(cells) < 9:
+                return None
+            product = cells[2]
+            symbol = cells[3]
+            # net_price не используем
+            qty_str = cells[5]
+            strike_str = cells[6]  # например, C4850.00 или пусто
+            b_s = cells[7].capitalize()  # Buy/Sell
+            price_str = cells[8]
+        else:
+            # Индексы: 0-product,1-sym,2-net_price,3-qty,4-C/P&strike,5-B/S,6-price
+            if len(cells) < 7:
+                return None
+            product = cells[0]
+            symbol = cells[1]
+            qty_str = cells[3]
+            strike_str = cells[4]
+            b_s = cells[5].capitalize()
+            price_str = cells[6]
+
+        quantity = int(qty_str) if qty_str.isdigit() else 1
+        price = float(price_str) if re.match(r'^-?\d+(\.\d+)?$', price_str) else 0.0
+
+        # Определяем тип ножки: опцион или фьючерс
+        option_type = ""
+        strike = strike_str
+        if strike_str and (strike_str[0] in ('C', 'P')):
+            option_type = "call" if strike_str[0] == 'C' else "put"
+        else:
+            # Фьючерс – нет страйка
+            option_type = "futures"
+            strike = ""
+
+        return {
+            "product_name": product,
+            "symbol": symbol,
+            "option_type": option_type,
+            "strike": strike,
+            "position": b_s,
+            "price": price,
+            "quantity": quantity
+        }
+    except (ValueError, IndexError) as e:
+        return None
+
+# ========== ГЛАВНАЯ ФУНКЦИЯ ==========
 def main():
-    print("Starting scrape...")
+    print("Запуск скрейпера CME Block Trades...")
     driver = create_driver()
     try:
         driver.get(URL)
         time.sleep(5)
-        # accept cookies if present
+        # Принять куки, если есть
         try:
             btn = WebDriverWait(driver, 5).until(
                 EC.element_to_be_clickable((By.ID, "onetrust-accept-btn-handler"))
@@ -209,28 +332,33 @@ def main():
             btn.click()
         except:
             pass
+
         if load_session(driver):
-            print("Session loaded")
+            print("Сессия загружена")
         else:
-            print("No session file, continuing...")
+            print("Файл сессии отсутствует, продолжаем без него...")
+
         if not wait_for_table(driver):
-            print("Table not found")
+            print("Таблица не найдена")
             return
+
         records = parse_all_gold_options(driver)
         if records:
             df_new = pd.DataFrame(records)
+            # Дедупликация: используем trade_id и время как основные ключи
             if os.path.exists(CSV_FILE):
                 df_existing = pd.read_csv(CSV_FILE)
-                # дедупликация по уникальным полям
-                key_cols = ['trade_date','time_utc5','symbol','strike','position','premium']
                 df_merged = pd.concat([df_existing, df_new], ignore_index=True)
+                # Убираем дубликаты, оставляем последнюю запись
+                key_cols = ['trade_id', 'time_utc5', 'symbol', 'strike', 'position']
                 df_merged.drop_duplicates(subset=key_cols, keep='last', inplace=True)
                 df_merged.to_csv(CSV_FILE, index=False)
+                print(f"Сохранено {len(records)} записей, всего в файле {len(df_merged)} строк")
             else:
                 df_new.to_csv(CSV_FILE, index=False)
-            print(f"Saved {len(records)} records, total {len(df_merged) if 'df_merged' in locals() else len(df_new)}")
+                print(f"Сохранено {len(records)} записей")
         else:
-            print("No records scraped")
+            print("Нет данных для сохранения")
     finally:
         driver.quit()
 
