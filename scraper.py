@@ -1,6 +1,6 @@
+# scraper.py
 import os, time, hashlib, pickle, re
 from datetime import datetime
-from dateutil import parser as date_parser
 import pandas as pd
 import pytz
 from selenium import webdriver
@@ -131,19 +131,18 @@ def wait_for_table(driver, timeout=TABLE_WAIT_TIMEOUT):
 
 # ========== ПАРСИНГ ДАТЫ ==========
 def parse_trade_date(driver):
-    """Извлекает дату из <span class='button-text'>Friday, 24 Apr 2026</span> и возвращает YYYY-MM-DD"""
+    """Извлекает дату из <span class='button-text'>Friday, 24 Apr 2026</span>"""
     try:
         span = driver.find_element(By.CSS_SELECTOR, "span.button-text")
         text = span.text.strip()
-        # "Friday, 24 Apr 2026" -> извлекаем часть после запятой
         match = re.search(r'\d{1,2}\s+\w{3}\s+\d{4}', text)
         if match:
             date_obj = datetime.strptime(match.group(), "%d %b %Y")
             return date_obj.strftime("%Y-%m-%d")
     except:
         pass
-    # fallback
-    return datetime.now().strftime("%Y-%m-%d")
+    # fallback: если дату не удалось извлечь – возвращаем пустую строку
+    return ""
 
 # ========== КОНВЕРТАЦИЯ ВРЕМЕНИ CT -> UTC+5 ==========
 def convert_time_to_utc5(time_str, trade_date_str):
@@ -153,13 +152,15 @@ def convert_time_to_utc5(time_str, trade_date_str):
     возвращает время в UTC+5 как строку HH:MM:SS
     """
     try:
+        if not trade_date_str:
+            return time_str  # без даты конвертация невозможна
         dt_naive = datetime.strptime(time_str, "%I:%M:%S %p")
         trade_date = datetime.strptime(trade_date_str, "%Y-%m-%d").date()
         ct_time = CT_TZ.localize(datetime.combine(trade_date, dt_naive.time()))
         target_time = ct_time.astimezone(TARGET_TZ)
         return target_time.strftime("%H:%M:%S")
     except:
-        return time_str  # если ошибка, вернуть оригинал
+        return time_str  # при ошибке возвращаем исходную строку
 
 # ========== ГЕНЕРАЦИЯ УНИКАЛЬНОГО TRADE ID ==========
 def generate_trade_id(trade_date, time_utc5, trade_type, legs):
@@ -209,7 +210,7 @@ def parse_all_gold_options(driver):
             current_time = convert_time_to_utc5(cells[0], trade_date)
             current_type = cells[1] if len(cells) > 1 else ""
             current_group_legs = []
-            # Теперь парсим оставшиеся колонки для этой строки (если есть)
+            # Парсим первую строку новой группы (содержит время и тип)
             leg = parse_leg_row(cells, is_header=True)
             if leg:
                 current_group_legs.append(leg)
@@ -227,7 +228,7 @@ def parse_all_gold_options(driver):
             "legs": current_group_legs
         })
 
-    # Теперь обрабатываем каждую группу
+    # Обрабатываем каждую группу
     for trade in trades:
         if not trade["legs"]:
             continue
@@ -237,7 +238,8 @@ def parse_all_gold_options(driver):
             breakeven = 0.0
             if leg["option_type"] in ("call", "put"):
                 try:
-                    strike_val = float(leg["strike"][1:])  # C4850.00 -> 4850.0
+                    # strike: 'C4850.00' -> 4850.0
+                    strike_val = float(leg["strike"][1:])
                     premium = float(leg["price"])
                     if leg["option_type"] == "call":
                         breakeven = round(strike_val + premium, 2)
@@ -258,16 +260,14 @@ def parse_all_gold_options(driver):
                 "position": leg.get("position", ""),
                 "price": leg.get("price", 0.0),
                 "quantity": leg.get("quantity", 1),
-                "breakeven": breakeven,
-                "scraped_at": datetime.now(pytz.utc).isoformat()
+                "breakeven": breakeven
             })
     return records
 
 def parse_leg_row(cells, is_header):
     """
-    Извлекает данные одной строки таблицы (ножки сделки) в зависимости от того,
-    присутствуют ли колонки TIME и TYPE (is_header).
-    Возвращает словарь с ключами: product_name, symbol, option_type, strike, position, price, quantity.
+    Извлекает данные одной строки таблицы (ножки сделки).
+    Возвращает словарь: product_name, symbol, option_type, strike, position, price, quantity.
     """
     try:
         if is_header:
@@ -276,7 +276,6 @@ def parse_leg_row(cells, is_header):
                 return None
             product = cells[2]
             symbol = cells[3]
-            # net_price не используем
             qty_str = cells[5]
             strike_str = cells[6]  # например, C4850.00 или пусто
             b_s = cells[7].capitalize()  # Buy/Sell
@@ -314,7 +313,7 @@ def parse_leg_row(cells, is_header):
             "price": price,
             "quantity": quantity
         }
-    except (ValueError, IndexError) as e:
+    except (ValueError, IndexError):
         return None
 
 # ========== ГЛАВНАЯ ФУНКЦИЯ ==========
@@ -345,18 +344,30 @@ def main():
         records = parse_all_gold_options(driver)
         if records:
             df_new = pd.DataFrame(records)
-            # Дедупликация: используем trade_id и время как основные ключи
+            # Фиксированный порядок колонок для совместимости с MQL5
+            cols_order = [
+                "trade_id", "trade_date", "time_utc5", "type", "product_name",
+                "symbol", "option_type", "strike", "position", "price",
+                "quantity", "breakeven"
+            ]
+            df_new = df_new[cols_order]
+
             if os.path.exists(CSV_FILE):
-                df_existing = pd.read_csv(CSV_FILE)
+                df_existing = pd.read_csv(CSV_FILE, dtype=str)
+                # Защита от пустых колонок (если старый файл имел другой формат)
+                for col in cols_order:
+                    if col not in df_existing.columns:
+                        df_existing[col] = ""
+                df_existing = df_existing[cols_order]
                 df_merged = pd.concat([df_existing, df_new], ignore_index=True)
-                # Убираем дубликаты, оставляем последнюю запись
-                key_cols = ['trade_id', 'time_utc5', 'symbol', 'strike', 'position']
-                df_merged.drop_duplicates(subset=key_cols, keep='last', inplace=True)
+                # Дедупликация: сохраняем первую запись (уже существующую) и отклоняем дубликаты
+                dedup_keys = ["trade_id", "time_utc5", "symbol", "strike", "position", "quantity"]
+                df_merged.drop_duplicates(subset=dedup_keys, keep='first', inplace=True)
                 df_merged.to_csv(CSV_FILE, index=False)
                 print(f"Сохранено {len(records)} записей, всего в файле {len(df_merged)} строк")
             else:
                 df_new.to_csv(CSV_FILE, index=False)
-                print(f"Сохранено {len(records)} записей")
+                print(f"Файл создан, сохранено {len(records)} записей")
         else:
             print("Нет данных для сохранения")
     finally:
