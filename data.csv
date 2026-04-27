@@ -1,4 +1,9 @@
 trade_id,trade_date,time_utc5,type,product_name,symbol,option_type,strike,position,quantity,breakeven,price
+e1b88b65a5fc,2026-04-27,19:27:17,Spread,Gold Option,OGQ6,call,C5120.00,Buy,50,5199.8,79.8
+e1b88b65a5fc,2026-04-27,19:27:17,Spread,Gold Futures,GCQ6,futures,,Sell,13,0.0,4741.4
+da4b6fac9eb3,2026-04-27,19:27:17,Spread,Gold Option,OGQ6,call,C4745.00,Buy,50,4950.8,205.8
+da4b6fac9eb3,2026-04-27,19:27:17,Spread,Gold Futures,GCQ6,futures,,Sell,26,0.0,4741.4
+b30c2ad671c0,2026-04-27,18:30:26,Option,Gold Option,OGM6,put,P4500.00,,200,4456.5,43.5
 72580122db68,2026-04-27,17:39:47,Strip,Gold Option,OGU6,call,C4900.00,Buy,50,5093.6,193.6
 72580122db68,2026-04-27,17:39:47,Strip,Gold Option,OGU6,call,C5400.00,Sell,50,5468.1,68.1
 72580122db68,2026-04-27,17:39:47,Strip,Gold Futures,GCV6,futures,,Sell,13,0.0,4788.0
