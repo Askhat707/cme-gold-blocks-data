@@ -1,17 +1,19 @@
 trade_id,trade_date,time_utc5,type,product_name,symbol,option_type,strike,position,quantity,breakeven,price
-b55af3394323,2026-04-27,21:24:00,Spread,Gold Option,OGZ6,call,C4835.00,Buy,30,5140.0,305.0
-18f5fed6f53a,2026-04-27,21:19:10,Strip,Gold Futures,GCM6,futures,,Buy,40,0.0,4685.0
+94b64e104cc1,2026-04-27,22:15:04,Strip,Gold Option,OGM6,put,P4600.00,Buy,50,4522.5,77.5
+94b64e104cc1,2026-04-27,22:15:04,Strip,Gold Futures,GCM6,futures,,Buy,16,0.0,4693.2
+b55af3394323,2026-04-27,21:24:00,Spread,Gold Option,OGZ6,call,C4835.00,Buy,50,5140.0,305.0
 18f5fed6f53a,2026-04-27,21:19:10,Strip,Gold Option,OGM6,put,P3800.00,Buy,1,3795.5,4.5
+18f5fed6f53a,2026-04-27,21:19:10,Strip,Gold Futures,GCM6,futures,,Buy,40,0.0,4685.0
 a8718fdc8140,2026-04-27,21:03:47,Spread,Gold Option,OGU6,call,C5300.00,Sell,80,5377.2,77.2
 a8718fdc8140,2026-04-27,21:03:47,Spread,Gold Futures,GCV6,futures,,Buy,16,0.0,4750.4
 a8718fdc8140,2026-04-27,21:03:47,Spread,Gold Option,OGZ6,call,C5500.00,Sell,160,5611.4,111.4
 a8718fdc8140,2026-04-27,21:03:47,Spread,Gold Futures,GCZ6,futures,,Buy,34,0.0,4785.6
-3937c88f25ea,2026-04-27,21:03:10,Spread,Gold Option,OGM6,call,C4800.00,Buy,200,4868.2,68.2
 3937c88f25ea,2026-04-27,21:03:10,Spread,Gold Option,OGM6,call,C4900.00,Sell,200,4940.0,40.0
-da4b6fac9eb3,2026-04-27,19:27:17,Spread,Gold Option,OGQ6,call,C4745.00,Buy,50,4950.8,205.8
-da4b6fac9eb3,2026-04-27,19:27:17,Spread,Gold Futures,GCQ6,futures,,Sell,26,0.0,4741.4
+3937c88f25ea,2026-04-27,21:03:10,Spread,Gold Option,OGM6,call,C4800.00,Buy,200,4868.2,68.2
 e1b88b65a5fc,2026-04-27,19:27:17,Spread,Gold Option,OGQ6,call,C5120.00,Buy,50,5199.8,79.8
 e1b88b65a5fc,2026-04-27,19:27:17,Spread,Gold Futures,GCQ6,futures,,Sell,13,0.0,4741.4
+da4b6fac9eb3,2026-04-27,19:27:17,Spread,Gold Option,OGQ6,call,C4745.00,Buy,50,4950.8,205.8
+da4b6fac9eb3,2026-04-27,19:27:17,Spread,Gold Futures,GCQ6,futures,,Sell,26,0.0,4741.4
 b30c2ad671c0,2026-04-27,18:30:26,Option,Gold Option,OGM6,put,P4500.00,,200,4456.5,43.5
 72580122db68,2026-04-27,17:39:47,Strip,Gold Option,OGU6,call,C4900.00,Buy,50,5093.6,193.6
 72580122db68,2026-04-27,17:39:47,Strip,Gold Option,OGU6,call,C5400.00,Sell,50,5468.1,68.1
