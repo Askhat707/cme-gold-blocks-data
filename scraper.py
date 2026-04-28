@@ -1,6 +1,6 @@
-# scraper.py — гарантирует CSV-файл, диагностика, защита от пустого результата
+# scraper.py — рабочий оригинал + авто-дата, дозапись, фильтр экспирации, expiry_date
 import os, time, hashlib, pickle, re
-from datetime import datetime, date
+from datetime import datetime, date, timedelta
 import pandas as pd
 import pytz
 from selenium import webdriver
@@ -13,10 +13,12 @@ from selenium.common.exceptions import TimeoutException, NoSuchElementException
 from webdriver_manager.chrome import ChromeDriverManager
 
 # ========== НАСТРОЙКИ ==========
+# Автоматически подставляем вчерашнюю дату (CME публикует блок-трейды следующего дня)
+yesterday = (date.today() - timedelta(days=1)).strftime("%Y-%m-%d")
 URL = (
     "https://www.cmegroup.com/clearing/operations-and-deliveries/"
     "accepted-trade-types/block-data.html"
-    "#tradeDate=2026-04-28&subGroups=35&exchanges=COMEX&foi=O"  # ← Обновите дату!
+    f"#tradeDate={yesterday}&subGroups=35&exchanges=COMEX&foi=O"
 )
 TABLE_WAIT_TIMEOUT = 45
 SESSION_FILE = "cme_session.pkl"
@@ -25,23 +27,52 @@ CSV_FILE = "data.csv"
 CT_TZ = pytz.timezone("US/Central")
 TARGET_TZ = pytz.timezone("Asia/Almaty")  # UTC+5
 
-# ========== КАЛЕНДАРЬ ЭКСПИРАЦИЙ ==========
+# ========== КАЛЕНДАРЬ ЭКСПИРАЦИЙ (Gold Options) ==========
 EXPIRY_DATES = {
-    "OGM6": "2026-05-26", "OGN6": "2026-06-25", "OGQ6": "2026-07-28",
-    "OGU6": "2026-08-26", "OGV6": "2026-09-24", "OGX6": "2026-10-27",
-    "OGZ6": "2026-11-24", "OGG7": "2027-01-26", "OGH7": "2027-02-23",
-    "OGJ7": "2027-03-24", "OGF7": "2026-12-28", "OGK7": "2027-04-27",
-    "OGM7": "2027-05-25", "OGN7": "2027-06-24", "OGQ7": "2027-07-27",
-    "OGU7": "2027-08-26", "OGV7": "2027-09-27", "OGX7": "2027-10-26",
-    "OGZ7": "2027-11-23", "OGF8": "2027-12-28", "OGG8": "2028-01-26",
-    "OGM8": "2028-05-25", "OGZ8": "2028-11-27", "OGM9": "2029-05-24",
-    "G1MK6": "2026-05-04", "G2MK6": "2026-05-11", "G3MK6": "2026-05-18",
-    "G1MM6": "2026-06-01", "G4TJ6": "2026-04-28", "G1TK6": "2026-05-05",
-    "G2TK6": "2026-05-12", "G3TK6": "2026-05-19", "G5WJ6": "2026-04-29",
-    "G1WK6": "2026-05-06", "G2WK6": "2026-05-13", "G3WK6": "2026-05-20",
-    "G5RJ6": "2026-04-30", "G1RK6": "2026-05-07", "G2RK6": "2026-05-14",
-    "G3RK6": "2026-05-21", "OG1K6": "2026-05-01", "OG2K6": "2026-05-08",
-    "OG3K6": "2026-05-15", "OG4K6": "2026-05-22",
+    "OGM6": "2026-05-26",
+    "OGN6": "2026-06-25",
+    "OGQ6": "2026-07-28",
+    "OGU6": "2026-08-26",
+    "OGV6": "2026-09-24",
+    "OGX6": "2026-10-27",
+    "OGZ6": "2026-11-24",
+    "OGG7": "2027-01-26",
+    "OGH7": "2027-02-23",
+    "OGJ7": "2027-03-24",
+    "OGF7": "2026-12-28",
+    "OGK7": "2027-04-27",
+    "OGM7": "2027-05-25",
+    "OGN7": "2027-06-24",
+    "OGQ7": "2027-07-27",
+    "OGU7": "2027-08-26",
+    "OGV7": "2027-09-27",
+    "OGX7": "2027-10-26",
+    "OGZ7": "2027-11-23",
+    "OGF8": "2027-12-28",
+    "OGG8": "2028-01-26",
+    "OGM8": "2028-05-25",
+    "OGZ8": "2028-11-27",
+    "OGM9": "2029-05-24",
+    "G1MK6": "2026-05-04",
+    "G2MK6": "2026-05-11",
+    "G3MK6": "2026-05-18",
+    "G1MM6": "2026-06-01",
+    "G4TJ6": "2026-04-28",
+    "G1TK6": "2026-05-05",
+    "G2TK6": "2026-05-12",
+    "G3TK6": "2026-05-19",
+    "G5WJ6": "2026-04-29",
+    "G1WK6": "2026-05-06",
+    "G2WK6": "2026-05-13",
+    "G3WK6": "2026-05-20",
+    "G5RJ6": "2026-04-30",
+    "G1RK6": "2026-05-07",
+    "G2RK6": "2026-05-14",
+    "G3RK6": "2026-05-21",
+    "OG1K6": "2026-05-01",
+    "OG2K6": "2026-05-08",
+    "OG3K6": "2026-05-15",
+    "OG4K6": "2026-05-22",
 }
 
 # ========== ДРАЙВЕР ==========
@@ -73,6 +104,7 @@ def create_driver():
         "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36"
     )
     opts.add_argument(f"user-agent={ua}")
+
     service = Service(ChromeDriverManager().install())
     driver = webdriver.Chrome(service=service, options=opts)
     driver.execute_cdp_cmd('Page.addScriptToEvaluateOnNewDocument', {
@@ -146,6 +178,7 @@ def wait_for_table(driver, timeout=TABLE_WAIT_TIMEOUT):
             driver.refresh()
     return False
 
+# ========== ПАРСИНГ ДАТЫ ==========
 def parse_trade_date(driver):
     try:
         spans = driver.find_elements(By.CSS_SELECTOR, "span.button-text")
@@ -166,6 +199,7 @@ def parse_trade_date(driver):
         pass
     return ""
 
+# ========== КОНВЕРТАЦИЯ ВРЕМЕНИ CT -> UTC+5 ==========
 def convert_time_to_utc5(time_str, trade_date_str):
     if not trade_date_str:
         return time_str
@@ -178,19 +212,13 @@ def convert_time_to_utc5(time_str, trade_date_str):
     except:
         return time_str
 
+# ========== ГЕНЕРАЦИЯ УНИКАЛЬНОГО TRADE ID ==========
 def generate_trade_id(trade_date, time_utc5, trade_type, legs):
     sorted_legs = sorted(
         [(lg.get("symbol",""), lg.get("strike",""), lg.get("position","")) for lg in legs]
     )
     raw = f"{trade_date}|{time_utc5}|{trade_type}|{sorted_legs}"
     return hashlib.md5(raw.encode()).hexdigest()[:12]
-
-# ========== ИСПРАВЛЕНИЕ ОШИБОК СИМВОЛОВ ==========
-def fix_ticker(symbol):
-    """Заменяет G на 6 в конце тикера, если это похоже на год."""
-    if re.match(r'^[A-Z0-9]+G$', symbol):
-        return symbol[:-1] + '6'
-    return symbol
 
 # ========== ПАРСИНГ ТАБЛИЦЫ ==========
 def parse_all_gold_options(driver):
@@ -200,11 +228,11 @@ def parse_all_gold_options(driver):
     try:
         table = driver.find_element(By.CSS_SELECTOR, "table.block-trades-table")
     except NoSuchElementException:
-        print("❌ Таблица не найдена на странице.")
+        print("❌ Таблица не найдена")
         return records
 
     rows = table.find_elements(By.TAG_NAME, "tr")
-    print(f"🔍 Найдено строк в таблице: {len(rows)}")
+    print(f"Найдено строк в таблице: {len(rows)}")
     current_time = None
     current_type = None
     current_group_legs = []
@@ -241,13 +269,13 @@ def parse_all_gold_options(driver):
             "legs": current_group_legs
         })
 
-    print(f"📦 Всего групп сделок до фильтрации: {len(trades)}")
+    print(f"Групп сделок до фильтрации: {len(trades)}")
     today = date.today()
-    filtered_legs = 0
     for trade in trades:
         if not trade["legs"]:
             continue
-        expired = False
+        # Проверяем, не истекли ли опционы в сделке
+        skip = False
         for leg in trade["legs"]:
             sym = leg.get("symbol", "")
             expiry_str = EXPIRY_DATES.get(sym)
@@ -255,19 +283,16 @@ def parse_all_gold_options(driver):
                 try:
                     expiry_date = datetime.strptime(expiry_str, "%Y-%m-%d").date()
                     if expiry_date < today:
-                        expired = True
-                        print(f"⛔ Отброшена сделка {trade['time']} — истёк {sym} ({expiry_str})")
+                        skip = True
+                        print(f"⛔ Пропущена сделка с {sym} (экспирация {expiry_str})")
                         break
                 except:
                     pass
-        if expired:
-            filtered_legs += 1
+        if skip:
             continue
 
         trade_id = generate_trade_id(trade_date, trade["time"], trade["type"], trade["legs"])
         for leg in trade["legs"]:
-            sym = fix_ticker(leg.get("symbol", ""))
-            expiry_date_str = EXPIRY_DATES.get(sym, "")
             breakeven = 0.0
             if leg["option_type"] in ("call", "put"):
                 try:
@@ -279,6 +304,9 @@ def parse_all_gold_options(driver):
                         breakeven = round(strike_val - premium, 2)
                 except:
                     breakeven = 0.0
+
+            sym = leg.get("symbol", "")
+            expiry_date_str = EXPIRY_DATES.get(sym, "")
 
             records.append({
                 "trade_id": trade_id,
@@ -293,41 +321,54 @@ def parse_all_gold_options(driver):
                 "price": leg.get("price", 0.0),
                 "quantity": leg.get("quantity", 1),
                 "breakeven": breakeven,
-                "expiry_date": expiry_date_str
+                "expiry_date": expiry_date_str,
             })
-    print(f"✅ Записей после фильтрации: {len(records)} (отброшено сделок: {filtered_legs})")
+    print(f"Записей после фильтрации: {len(records)}")
     return records
 
 def parse_leg_row(cells, is_first_row_of_group):
+    """
+    Извлекает данные одной строки таблицы (ножки сделки).
+    is_first_row_of_group=True для строки, содержащей время и тип сделки.
+    """
     try:
         if is_first_row_of_group:
+            # Первая строка группы: 0-time, 1-type, 2-product, 3-sym, 4-net_price, 5-qty,
+            # 6-C/P&strike, 7-B/S, 8-price
             if len(cells) < 9:
                 return None
             product = cells[2]
             symbol = cells[3]
-            qty_str = cells[5]
-            strike_str = cells[6]
-            b_s = cells[7].capitalize()
-            price_str = cells[8]
+            qty_str = cells[5]          # qty находится после net-price
+            strike_str = cells[6]       # C/P & Strike
+            b_s = cells[7].capitalize() # B/S
+            price_str = cells[8]        # Price
         else:
+            # Дополнительная строка (может быть с net-price или без)
+            # Минимум 6 элементов: product, symbol, qty, strike, bs, price
             if len(cells) < 6:
                 return None
             product = cells[0]
             symbol = cells[1]
+            # Если ячеек 7, значит присутствует net-price (cells[2])
             if len(cells) >= 7 and cells[2].strip() != "":
+                # Формат: product, symbol, net-price, qty, strike, bs, price
                 qty_str = cells[3]
                 strike_str = cells[4]
                 b_s = cells[5].capitalize()
                 price_str = cells[6]
             else:
+                # Формат: product, symbol, qty, strike, bs, price (нет net-price)
                 qty_str = cells[2]
                 strike_str = cells[3]
                 b_s = cells[4].capitalize()
                 price_str = cells[5]
 
+        # Безопасное преобразование quantity и price
         quantity = int(qty_str) if qty_str.isdigit() else 1
         price = float(price_str) if re.match(r'^-?\d+(\.\d+)?$', price_str) else 0.0
 
+        # Определяем тип ноги (опцион или фьючерс)
         product_lower = product.lower()
         if "futures" in product_lower:
             option_type = "futures"
@@ -338,12 +379,12 @@ def parse_leg_row(cells, is_first_row_of_group):
             if strike_str and (strike_str[0] in ('C', 'P')):
                 option_type = "call" if strike_str[0] == 'C' else "put"
             else:
-                option_type = "futures"
+                option_type = "futures"  # запасной вариант
                 strike = ""
 
         return {
             "product_name": product,
-            "symbol": fix_ticker(symbol),
+            "symbol": symbol,
             "option_type": option_type,
             "strike": strike,
             "position": b_s,
@@ -356,8 +397,8 @@ def parse_leg_row(cells, is_first_row_of_group):
 # ========== ГЛАВНАЯ ФУНКЦИЯ ==========
 def main():
     print("Запуск скрейпера CME Block Trades...")
+    print("Дата для запроса:", URL.split("tradeDate=")[1].split("&")[0])
     driver = create_driver()
-    new_records = []
     try:
         driver.get(URL)
         time.sleep(5)
@@ -375,43 +416,42 @@ def main():
             print("Файл сессии отсутствует, продолжаем без него...")
 
         if not wait_for_table(driver):
-            print("❌ Таблица не загрузилась.")
+            print("❌ Таблица не загрузилась (возможно, нет данных за выбранную дату)")
             new_records = []
         else:
             new_records = parse_all_gold_options(driver)
-    except Exception as e:
-        print(f"❌ Ошибка во время скрапинга: {e}")
+
+        # === Дозапись в CSV ===
+        cols_order = [
+            "trade_id", "trade_date", "time_utc5", "type", "product_name",
+            "symbol", "option_type", "strike", "position", "quantity",
+            "breakeven", "price", "expiry_date"
+        ]
+        if os.path.exists(CSV_FILE):
+            df_old = pd.read_csv(CSV_FILE)
+            # Если старый файл без колонки expiry_date, добавляем
+            for col in cols_order:
+                if col not in df_old.columns:
+                    df_old[col] = ""
+            df_old = df_old[cols_order]
+        else:
+            df_old = pd.DataFrame(columns=cols_order)
+
+        if new_records:
+            df_new = pd.DataFrame(new_records)[cols_order]
+            df_combined = pd.concat([df_old, df_new], ignore_index=True)
+            df_combined.drop_duplicates(subset=["trade_id", "symbol", "position"], inplace=True)
+            df_combined.sort_values(by=["time_utc5"], ascending=False, inplace=True)
+            print(f"✅ Добавлено {len(df_new)} записей, всего {len(df_combined)}.")
+        else:
+            df_combined = df_old
+            print("ℹ️ Нет новых записей, файл остаётся без изменений.")
+
+        df_combined.to_csv(CSV_FILE, index=False)
+        print("Файл сохранён:", CSV_FILE)
+
     finally:
         driver.quit()
-
-    # === СОХРАНЕНИЕ ВСЕГДА ===
-    cols_order = [
-        "trade_id", "trade_date", "time_utc5", "type", "product_name",
-        "symbol", "option_type", "strike", "position", "quantity",
-        "breakeven", "price", "expiry_date"
-    ]
-    if os.path.exists(CSV_FILE):
-        df_old = pd.read_csv(CSV_FILE)
-        # Приводим старые колонки, если нет expiry_date
-        for col in cols_order:
-            if col not in df_old.columns:
-                df_old[col] = ""
-        df_old = df_old[cols_order]
-    else:
-        df_old = pd.DataFrame(columns=cols_order)
-
-    if new_records:
-        df_new = pd.DataFrame(new_records)[cols_order]
-        df_combined = pd.concat([df_old, df_new], ignore_index=True)
-        df_combined.drop_duplicates(subset=["trade_id", "symbol", "position"], inplace=True)
-        df_combined.sort_values(by=["time_utc5"], ascending=False, inplace=True)
-        print(f"📊 Добавлено {len(df_new)} записей, всего {len(df_combined)}.")
-    else:
-        df_combined = df_old
-        print("ℹ️ Нет новых записей, сохраняем существующий файл.")
-
-    df_combined.to_csv(CSV_FILE, index=False)
-    print(f"💾 Файл {CSV_FILE} сохранён.")
 
 if __name__ == "__main__":
     main()
