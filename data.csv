@@ -10,10 +10,10 @@ a8718fdc8140,2026-04-27,21:03:47,Spread,Gold Option,OGZ6,call,C5500.00,Sell,160,
 a8718fdc8140,2026-04-27,21:03:47,Spread,Gold Futures,GCZ6,futures,,Buy,34,0.0,4785.6,
 3937c88f25ea,2026-04-27,21:03:10,Spread,Gold Option,OGM6,call,C4900.00,Sell,200,4940.0,40.0,2026-05-26
 3937c88f25ea,2026-04-27,21:03:10,Spread,Gold Option,OGM6,call,C4800.00,Buy,200,4868.2,68.2,2026-05-26
-da4b6fac9eb3,2026-04-27,19:27:17,Spread,Gold Option,OGQ6,call,C4745.00,Buy,50,4950.8,205.8,2026-07-28
-da4b6fac9eb3,2026-04-27,19:27:17,Spread,Gold Futures,GCQ6,futures,,Sell,26,0.0,4741.4,
 e1b88b65a5fc,2026-04-27,19:27:17,Spread,Gold Option,OGQ6,call,C5120.00,Buy,50,5199.8,79.8,2026-07-28
 e1b88b65a5fc,2026-04-27,19:27:17,Spread,Gold Futures,GCQ6,futures,,Sell,13,0.0,4741.4,
+da4b6fac9eb3,2026-04-27,19:27:17,Spread,Gold Option,OGQ6,call,C4745.00,Buy,50,4950.8,205.8,2026-07-28
+da4b6fac9eb3,2026-04-27,19:27:17,Spread,Gold Futures,GCQ6,futures,,Sell,26,0.0,4741.4,
 b30c2ad671c0,2026-04-27,18:30:26,Option,Gold Option,OGM6,put,P4500.00,,200,4456.5,43.5,2026-05-26
 b30c2ad671c0,2026-04-27,18:30:26,Option,Gold Option,OGM6,put,P4500.00,,200,4456.5,43.5,2026-05-26
 72580122db68,2026-04-27,17:39:47,Strip,Gold Option,OGU6,call,C4900.00,Buy,50,5093.6,193.6,2026-08-26
