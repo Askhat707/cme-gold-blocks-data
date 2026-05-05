@@ -2,8 +2,8 @@ trade_id,trade_date,time_utc5,type,product_name,symbol,option_type,strike,positi
 0e4d21586d8a,2026-04-28,23:58:05,Spread,Gold Option,OGZ6,call,C7000.00,Sell,25,7023.1,23.1,2026-11-24
 0e4d21586d8a,2026-04-28,23:58:05,Spread,Gold Option,OGZ6,call,C6000.00,Buy,25,6053.0,53.0,2026-11-24
 4b2cd4b95ebc,2026-04-30,23:48:14,Spread,Gold Option,OGQ6,put,P2500.00,Buy,100,2498.4,1.6,2026-07-28
-4b2cd4b95ebc,2026-04-30,23:48:14,Spread,Gold Futures,GCQ6,futures,,Buy,2,0.0,4670.0,
 4b2cd4b95ebc,2026-04-30,23:48:14,Spread,Gold Option,OGQ6,call,C6000.00,Sell,100,6011.6,11.6,2026-07-28
+4b2cd4b95ebc,2026-04-30,23:48:14,Spread,Gold Futures,GCQ6,futures,,Buy,2,0.0,4670.0,
 abf673815d25,2026-04-30,23:40:30,Spread,Silver Option,SOV6,put,P65.00,Sell,100,61.3,3.7,
 abf673815d25,2026-04-30,23:40:30,Spread,Silver Futures,SIZ6,futures,,Sell,48,0.0,75.5,
 abf673815d25,2026-04-30,23:40:30,Spread,Silver Option,SOV6,call,C95.00,Buy,100,98.78,3.785,
@@ -12,9 +12,9 @@ a50ecce94321,2026-04-30,23:40:15,Spread,Silver Option,SOV6,call,C95.00,Buy,20,98
 a50ecce94321,2026-04-30,23:40:15,Spread,Silver Futures,SIZ6,futures,,Sell,10,0.0,75.5,
 521570912179,2026-04-28,23:26:51,Option,Silver Weekly Friday Option - Week 1,SO1K6,put,P65.00,,50,64.92,0.078,
 56d2372324ee,2026-04-28,23:26:51,Option,Silver Weekly Friday Option - Week 2,SO2K6,put,P65.00,,25,64.68,0.32,
+f9dbd35d9bc9,2026-04-30,23:05:54,Spread,Gold Option,OGM6,call,C5250.00,Buy,100,5564.4,314.4,2026-05-26
 f9dbd35d9bc9,2026-04-30,23:05:54,Spread,Gold Option,OGM6,put,P5250.00,Sell,100,4937.0,313.0,2026-05-26
 f9dbd35d9bc9,2026-04-30,23:05:54,Spread,Gold Futures,GCM6,futures,,Sell,100,0.0,5250.0,
-f9dbd35d9bc9,2026-04-30,23:05:54,Spread,Gold Option,OGM6,call,C5250.00,Buy,100,5564.4,314.4,2026-05-26
 dca6eaedc6c9,2026-04-30,22:56:45,Spread,Silver Futures,SIU6,futures,,Sell,2,0.0,74.231,
 dca6eaedc6c9,2026-04-30,22:56:45,Spread,Silver Option,SOM6,call,C78.00,Buy,15,79.72,1.72,
 dca6eaedc6c9,2026-04-30,22:56:45,Spread,Silver Futures,SIN6,futures,,Sell,5,0.0,73.73,
@@ -23,10 +23,10 @@ dca6eaedc6c9,2026-04-30,22:56:45,Spread,Silver Option,SOQ6,put,P65.00,Sell,10,62
 0f18e9d822b2,2026-04-30,22:56:38,Spread,Silver Futures,SIN6,futures,,Sell,10,0.0,73.73,
 0f18e9d822b2,2026-04-30,22:56:38,Spread,Silver Option,SOQ6,put,P65.00,Sell,20,62.69,2.315,
 0f18e9d822b2,2026-04-30,22:56:38,Spread,Silver Futures,SIU6,futures,,Sell,4,0.0,74.231,
-e2fe55eef205,2026-04-30,22:56:15,Spread,Silver Futures,SIU6,futures,,Sell,4,0.0,74.231,
-e2fe55eef205,2026-04-30,22:56:15,Spread,Silver Option,SOM6,call,C78.00,Buy,30,79.72,1.72,
-e2fe55eef205,2026-04-30,22:56:15,Spread,Silver Futures,SIN6,futures,,Sell,10,0.0,73.73,
 e2fe55eef205,2026-04-30,22:56:15,Spread,Silver Option,SOQ6,put,P65.00,Sell,20,62.69,2.315,
+e2fe55eef205,2026-04-30,22:56:15,Spread,Silver Futures,SIN6,futures,,Sell,10,0.0,73.73,
+e2fe55eef205,2026-04-30,22:56:15,Spread,Silver Option,SOM6,call,C78.00,Buy,30,79.72,1.72,
+e2fe55eef205,2026-04-30,22:56:15,Spread,Silver Futures,SIU6,futures,,Sell,4,0.0,74.231,
 5fdd3f801c33,2026-04-30,22:35:49,Spread,Silver Option,SOM6,put,P65.00,Buy,26,64.35,0.65,
 5fdd3f801c33,2026-04-30,22:35:49,Spread,Silver Futures,SIN6,futures,,Buy,8,0.0,74.02,
 5fdd3f801c33,2026-04-30,22:35:49,Spread,Silver Option,SOM6,call,C80.00,Sell,20,81.41,1.405,
@@ -36,8 +36,8 @@ e2fe55eef205,2026-04-30,22:56:15,Spread,Silver Option,SOQ6,put,P65.00,Sell,20,62
 35398f5c1ea0,2026-04-29,22:34:30,Strip,Gold Option,OGQ6,put,P4050.00,Sell,10,4003.2,46.8,2026-07-28
 35398f5c1ea0,2026-04-29,22:34:30,Strip,Gold Option,OGM6,call,C4600.00,Buy,10,4696.5,96.5,2026-05-26
 35398f5c1ea0,2026-04-29,22:34:30,Strip,Gold Futures,GCM6,futures,,Sell,5,0.0,4567.0,
-b79abbfb4380,2026-05-04,22:32:42,Spread,Gold Futures,GCM6,futures,,Sell,10,0.0,4532.0,
 b79abbfb4380,2026-05-04,22:32:42,Spread,Gold Weekly Thursday Option - Week 3,G3RK6,call,C4600.00,Buy,25,4665.2,65.2,2026-05-21
+b79abbfb4380,2026-05-04,22:32:42,Spread,Gold Futures,GCM6,futures,,Sell,10,0.0,4532.0,
 011b9897585a,2026-05-04,22:32:38,Spread,Gold Futures,GCM6,futures,,Sell,28,0.0,4532.0,
 011b9897585a,2026-05-04,22:32:38,Spread,Gold Weekly Thursday Option - Week 3,G3RK6,call,C4600.00,Buy,70,4665.2,65.2,2026-05-21
 785d92564ffb,2026-05-04,22:32:23,Spread,Gold Weekly Thursday Option - Week 3,G3RK6,call,C4600.00,Buy,55,4665.2,65.2,2026-05-21
@@ -48,21 +48,21 @@ b79abbfb4380,2026-05-04,22:32:42,Spread,Gold Weekly Thursday Option - Week 3,G3R
 0bd56198d7a0,2026-04-30,22:29:27,Spread,Silver Option,SOM6,put,P65.00,Buy,39,64.35,0.65,
 0bd56198d7a0,2026-04-30,22:29:27,Spread,Silver Option,SOM6,call,C80.00,Sell,30,81.41,1.405,
 0bd56198d7a0,2026-04-30,22:29:27,Spread,Silver Futures,SIN6,futures,,Buy,12,0.0,74.02,
+c9ae8796dcca,2026-04-29,22:20:25,Strip,Silver Option,SOU6,call,C73.00,Buy,145,80.04,7.036,
 c9ae8796dcca,2026-04-29,22:20:25,Strip,Silver Futures,SIU6,futures,,Sell,44,0.0,72.6,
 c9ae8796dcca,2026-04-29,22:20:25,Strip,Silver Option,SOU6,call,C90.00,Sell,145,92.79,2.786,
-c9ae8796dcca,2026-04-29,22:20:25,Strip,Silver Option,SOU6,call,C73.00,Buy,145,80.04,7.036,
-94b64e104cc1,2026-04-27,22:15:04,Strip,Gold Option,OGM6,put,P4600.00,Buy,50,4522.5,77.5,2026-05-26
 94b64e104cc1,2026-04-27,22:15:04,Strip,Gold Futures,GCM6,futures,,Buy,16,0.0,4693.2,
+94b64e104cc1,2026-04-27,22:15:04,Strip,Gold Option,OGM6,put,P4600.00,Buy,50,4522.5,77.5,2026-05-26
 72f32bb44e53,2026-05-01,21:54:00,Spread,Gold Option,OGN6,call,C5200.00,Buy,210,5232.0,32.0,2026-06-25
-72f32bb44e53,2026-05-01,21:54:00,Spread,Gold Futures,GCQ6,futures,,Sell,26,0.0,4684.2,
 72f32bb44e53,2026-05-01,21:54:00,Spread,Gold Option,OGZ6,call,C5500.00,Sell,70,5612.2,112.2,2026-11-24
 72f32bb44e53,2026-05-01,21:54:00,Spread,Gold Futures,GCZ6,futures,,Buy,14,0.0,4752.0,
+72f32bb44e53,2026-05-01,21:54:00,Spread,Gold Futures,GCQ6,futures,,Sell,26,0.0,4684.2,
 8768c7d16c97,2026-04-29,21:29:31,Spread,Gold Futures,GCM6,futures,,Sell,7,0.0,4572.0,
 8768c7d16c97,2026-04-29,21:29:31,Spread,Gold Option,OGZ6,call,C6400.00,Sell,150,6428.2,28.2,2026-11-24
 8768c7d16c97,2026-04-29,21:29:31,Spread,Gold Option,OGZ6,call,C5900.00,Buy,150,5951.2,51.2,2026-11-24
-1c9995b330e2,2026-04-28,21:25:56,Strip,Gold Option,OGQ6,put,P4090.00,Buy,50,4045.0,45.0,2026-07-28
 1c9995b330e2,2026-04-28,21:25:56,Strip,Gold Option,OGQ6,call,C5280.00,Sell,50,5316.7,36.7,2026-07-28
 1c9995b330e2,2026-04-28,21:25:56,Strip,Gold Futures,GCQ6,futures,,Buy,14,0.0,4633.0,
+1c9995b330e2,2026-04-28,21:25:56,Strip,Gold Option,OGQ6,put,P4090.00,Buy,50,4045.0,45.0,2026-07-28
 1b38e42e8bac,2026-05-01,21:24:13,Strip,Gold Futures,GCM6,futures,,Sell,6,0.0,4658.0,
 1b38e42e8bac,2026-05-01,21:24:13,Strip,Gold Weekly Friday Option - Week 2,OG2K6,call,C4750.00,Buy,20,4772.8,22.8,2026-05-08
 b55af3394323,2026-04-27,21:24:00,Spread,Gold Option,OGZ6,call,C4835.00,Buy,30,5140.0,305.0,2026-11-24
@@ -74,8 +74,8 @@ a96a9602ea08,2026-04-28,21:21:46,Spread,Gold Option,OGZ6,put,P4300.00,Buy,140,41
 1ed6843f1f36,2026-04-29,21:19:44,Spread,Gold Futures,GCM6,futures,,Buy,8,0.0,4570.0,
 18f5fed6f53a,2026-04-27,21:19:10,Strip,Gold Option,OGM6,put,P3800.00,Buy,1,3795.5,4.5,2026-05-26
 18f5fed6f53a,2026-04-27,21:19:10,Strip,Gold Futures,GCM6,futures,,Buy,40,0.0,4685.0,
-d85815d9e7e4,2026-04-29,21:16:25,Spread,Silver Futures,SIZ6,futures,,Sell,6,0.0,73.4,
 d85815d9e7e4,2026-04-29,21:16:25,Spread,Silver Option,SOZ6,call,C110.00,Buy,30,112.81,2.81,
+d85815d9e7e4,2026-04-29,21:16:25,Spread,Silver Futures,SIZ6,futures,,Sell,6,0.0,73.4,
 677eddb5273b,2026-04-28,21:16:17,Spread,Gold Option,OGM6,call,C5000.00,Buy,100,5011.7,11.7,2026-05-26
 677eddb5273b,2026-04-28,21:16:17,Spread,Gold Option,OGM6,call,C4800.00,Sell,100,4838.6,38.6,2026-05-26
 8c0702d2ca56,2026-04-29,21:13:11,Spread,Silver Option,SOZ6,put,P55.00,Sell,100,52.8,2.2,
@@ -86,25 +86,25 @@ d85815d9e7e4,2026-04-29,21:16:25,Spread,Silver Option,SOZ6,call,C110.00,Buy,30,1
 f212e3771089,2026-04-29,21:07:41,Spread,Gold Option,OGN6,call,C5200.00,Sell,180,5223.4,23.4,2026-06-25
 f212e3771089,2026-04-29,21:07:41,Spread,Gold Futures,GCQ6,futures,,Buy,49,0.0,4602.7,
 f212e3771089,2026-04-29,21:07:41,Spread,Gold Option,OGN6,put,P4500.00,Buy,90,4376.7,123.3,2026-06-25
-6e9ddc1e4096,2026-04-28,21:03:52,Spread,Gold Futures,GCV6,futures,,Buy,43,0.0,4665.8,
-6e9ddc1e4096,2026-04-28,21:03:52,Spread,Gold Option,OGN6,put,P4100.00,Buy,180,4072.3,27.7,2026-06-25
 6e9ddc1e4096,2026-04-28,21:03:52,Spread,Gold Futures,GCQ6,futures,,Buy,18,0.0,4632.5,
 6e9ddc1e4096,2026-04-28,21:03:52,Spread,Gold Option,OGU6,call,C4700.00,Sell,90,4918.9,218.9,2026-08-26
+6e9ddc1e4096,2026-04-28,21:03:52,Spread,Gold Option,OGN6,put,P4100.00,Buy,180,4072.3,27.7,2026-06-25
+6e9ddc1e4096,2026-04-28,21:03:52,Spread,Gold Futures,GCV6,futures,,Buy,43,0.0,4665.8,
 a8718fdc8140,2026-04-27,21:03:47,Spread,Gold Futures,GCV6,futures,,Buy,16,0.0,4750.4,
 a8718fdc8140,2026-04-27,21:03:47,Spread,Gold Option,OGZ6,call,C5500.00,Sell,160,5611.4,111.4,2026-11-24
 a8718fdc8140,2026-04-27,21:03:47,Spread,Gold Option,OGU6,call,C5300.00,Sell,80,5377.2,77.2,2026-08-26
 a8718fdc8140,2026-04-27,21:03:47,Spread,Gold Futures,GCZ6,futures,,Buy,34,0.0,4785.6,
 3937c88f25ea,2026-04-27,21:03:10,Spread,Gold Option,OGM6,call,C4800.00,Buy,200,4868.2,68.2,2026-05-26
 3937c88f25ea,2026-04-27,21:03:10,Spread,Gold Option,OGM6,call,C4900.00,Sell,200,4940.0,40.0,2026-05-26
-fd8a9a285875,2026-04-29,21:02:00,Spread,Gold Futures,GCV6,futures,,Sell,23,0.0,4632.3,
-fd8a9a285875,2026-04-29,21:02:00,Spread,Gold Option,OGU6,call,C4700.00,Buy,50,4905.0,205.0,2026-08-26
 fd8a9a285875,2026-04-29,21:02:00,Spread,Gold Futures,GCQ6,futures,,Sell,4,0.0,4600.5,
 fd8a9a285875,2026-04-29,21:02:00,Spread,Gold Option,OGQ6,put,P3900.00,Sell,50,3870.0,30.0,2026-07-28
-286162e2a4cf,2026-05-01,21:01:52,Spread,Gold Weekly Friday Option - Week 2,OG2K6,call,C4750.00,Buy,50,4773.7,23.7,2026-05-08
+fd8a9a285875,2026-04-29,21:02:00,Spread,Gold Futures,GCV6,futures,,Sell,23,0.0,4632.3,
+fd8a9a285875,2026-04-29,21:02:00,Spread,Gold Option,OGU6,call,C4700.00,Buy,50,4905.0,205.0,2026-08-26
 286162e2a4cf,2026-05-01,21:01:52,Spread,Gold Futures,GCM6,futures,,Sell,12,0.0,4657.0,
+286162e2a4cf,2026-05-01,21:01:52,Spread,Gold Weekly Friday Option - Week 2,OG2K6,call,C4750.00,Buy,50,4773.7,23.7,2026-05-08
 a54e00fb8ad0,2026-04-28,20:58:00,Spread,Gold Option,OGN6,call,C4650.00,Buy,200,4803.6,153.6,2026-06-25
-a54e00fb8ad0,2026-04-28,20:58:00,Spread,Gold Futures,GCQ6,futures,,Sell,111,0.0,4631.4,
 a54e00fb8ad0,2026-04-28,20:58:00,Spread,Gold Option,OGQ6,put,P3900.00,Sell,200,3873.0,27.0,2026-07-28
+a54e00fb8ad0,2026-04-28,20:58:00,Spread,Gold Futures,GCQ6,futures,,Sell,111,0.0,4631.4,
 f2cd3261bf3b,2026-05-01,20:57:19,Spread,Silver Weekly Friday Option - Week 2,SO2K6,put,P76.00,Buy,50,74.45,1.55,
 f2cd3261bf3b,2026-05-01,20:57:19,Spread,Silver Futures,SIN6,futures,,Buy,22,0.0,76.65,
 cb3a39b416ad,2026-04-29,20:53:44,Strip,Gold Futures,GCM6,futures,,Buy,8,0.0,4563.0,
@@ -112,9 +112,9 @@ cb3a39b416ad,2026-04-29,20:53:44,Strip,Gold Weekly Thursday Option - Week 2,G2RK
 1d71a77bb5e8,2026-04-28,20:49:30,Strip,Gold Option,OGM6,call,C4800.00,Buy,25,4838.0,38.0,2026-05-26
 1d71a77bb5e8,2026-04-28,20:49:30,Strip,Gold Option,OGM6,call,C5000.00,Sell,25,5013.2,13.2,2026-05-26
 1d71a77bb5e8,2026-04-28,20:49:30,Strip,Gold Futures,GCM6,futures,,Sell,4,0.0,4588.0,
+a0981bac5990,2026-04-30,20:43:44,Spread,Gold Option,OGZ6,call,C5600.00,Buy,200,5690.5,90.5,2026-11-24
 a0981bac5990,2026-04-30,20:43:44,Spread,Gold Option,OGZ6,call,C5800.00,Sell,200,5869.1,69.1,2026-11-24
 a0981bac5990,2026-04-30,20:43:44,Spread,Gold Futures,GCM6,futures,,Sell,8,0.0,4635.0,
-a0981bac5990,2026-04-30,20:43:44,Spread,Gold Option,OGZ6,call,C5600.00,Buy,200,5690.5,90.5,2026-11-24
 5101a3015916,2026-04-28,20:40:32,Spread,Silver Option,SOU6,call,C85.00,Buy,100,89.18,4.18,
 5101a3015916,2026-04-28,20:40:32,Spread,Silver Futures,SIU6,futures,,Sell,30,0.0,73.61,
 57f8d6839ddd,2026-04-28,20:29:22,Spread,Gold Futures,GCM6,futures,,Buy,16,0.0,4582.0,
@@ -123,20 +123,20 @@ a0981bac5990,2026-04-30,20:43:44,Spread,Gold Option,OGZ6,call,C5600.00,Buy,200,5
 1fca740f8ddf,2026-04-29,20:23:52,Spread,Gold Option,OGM6,call,C4900.00,Buy,50,4919.8,19.8,2026-05-26
 2bfbea61852e,2026-04-29,20:23:37,Spread,Gold Futures,GCM6,futures,,Sell,7,0.0,4558.0,
 2bfbea61852e,2026-04-29,20:23:37,Spread,Gold Option,OGM6,call,C4900.00,Buy,50,4919.8,19.8,2026-05-26
-7701de87dc26,2026-04-29,20:23:31,Spread,Gold Futures,GCM6,futures,,Sell,7,0.0,4558.0,
 7701de87dc26,2026-04-29,20:23:31,Spread,Gold Option,OGM6,call,C4900.00,Buy,50,4919.8,19.8,2026-05-26
-1f89f282a4d9,2026-04-29,20:23:29,Spread,Silver Option,SOQ6,put,P55.00,Sell,32,54.2,0.799,
+7701de87dc26,2026-04-29,20:23:31,Spread,Gold Futures,GCM6,futures,,Sell,7,0.0,4558.0,
 1f89f282a4d9,2026-04-29,20:23:29,Spread,Silver Option,SOM6,put,P65.00,Buy,32,63.92,1.079,
 1f89f282a4d9,2026-04-29,20:23:29,Spread,Silver Futures,SIN6,futures,,Buy,6,0.0,72.1,
 1f89f282a4d9,2026-04-29,20:23:29,Spread,Silver Futures,SIU6,futures,,Sell,2,0.0,72.6,
+1f89f282a4d9,2026-04-29,20:23:29,Spread,Silver Option,SOQ6,put,P55.00,Sell,32,54.2,0.799,
 ce07f3567a93,2026-04-29,20:23:11,Spread,Gold Futures,GCM6,futures,,Sell,14,0.0,4558.0,
 ce07f3567a93,2026-04-29,20:23:11,Spread,Gold Option,OGM6,call,C4900.00,Buy,100,4919.8,19.8,2026-05-26
 cce27f01bef7,2026-04-29,20:21:48,Strip,Gold Option,OGG7,put,P4785.00,Sell,100,4378.0,407.0,2027-01-26
 cce27f01bef7,2026-04-29,20:21:48,Strip,Gold Option,OGZ6,put,P4725.00,Buy,110,4373.0,352.0,2026-11-24
 7374f596e064,2026-04-29,20:11:16,Spread,Silver Option,SOQ6,call,C75.00,Buy,13,80.38,5.38,
 3f9ec6255ef9,2026-04-29,20:11:13,Spread,Silver Option,SOQ6,call,C75.00,Buy,13,80.38,5.38,
-f19f5cf917f5,2026-05-01,20:02:43,Spread,Gold Futures,GCM6,futures,,Sell,5,0.0,4643.0,
 f19f5cf917f5,2026-05-01,20:02:43,Spread,Gold Weekly Friday Option - Week 2,OG2K6,call,C4750.00,Buy,25,4771.8,21.8,2026-05-08
+f19f5cf917f5,2026-05-01,20:02:43,Spread,Gold Futures,GCM6,futures,,Sell,5,0.0,4643.0,
 a329fa3411e8,2026-05-01,20:02:21,Spread,Gold Futures,GCM6,futures,,Sell,11,0.0,4643.0,
 a329fa3411e8,2026-05-01,20:02:21,Spread,Gold Weekly Friday Option - Week 2,OG2K6,call,C4750.00,Buy,50,4771.8,21.8,2026-05-08
 d16b882f7cec,2026-05-01,20:02:02,Spread,Gold Weekly Friday Option - Week 2,OG2K6,call,C4750.00,Buy,25,4771.8,21.8,2026-05-08
@@ -145,10 +145,10 @@ a17950be6a30,2026-05-01,20:01:20,Spread,Gold Option,OGU6,call,C5300.00,Buy,120,5
 a17950be6a30,2026-05-01,20:01:20,Spread,Gold Futures,GCV6,futures,,Sell,23,0.0,4711.5,
 a17950be6a30,2026-05-01,20:01:20,Spread,Gold Futures,GCZ6,futures,,Sell,4,0.0,4746.5,
 a17950be6a30,2026-05-01,20:01:20,Spread,Gold Option,OGZ6,put,P3400.00,Sell,120,3380.3,19.7,2026-11-24
-96210727495c,2026-04-30,19:58:21,Spread,Silver Option,SOZ6,call,C150.00,Buy,40,151.34,1.335,
-96210727495c,2026-04-30,19:58:21,Spread,Silver Futures,SIZ6,futures,,Sell,3,0.0,74.9,
-96210727495c,2026-04-30,19:58:21,Spread,Silver Futures,SIU6,futures,,Buy,9,0.0,74.2,
 96210727495c,2026-04-30,19:58:21,Spread,Silver Option,SOU6,call,C95.00,Sell,40,97.58,2.575,
+96210727495c,2026-04-30,19:58:21,Spread,Silver Futures,SIU6,futures,,Buy,9,0.0,74.2,
+96210727495c,2026-04-30,19:58:21,Spread,Silver Futures,SIZ6,futures,,Sell,3,0.0,74.9,
+96210727495c,2026-04-30,19:58:21,Spread,Silver Option,SOZ6,call,C150.00,Buy,40,151.34,1.335,
 c88bd1ecf4ac,2026-04-29,19:55:00,Spread,Gold Option,OGZ6,put,P4300.00,Buy,200,4129.0,171.0,2026-11-24
 c88bd1ecf4ac,2026-04-29,19:55:00,Spread,Gold Futures,GCZ6,futures,,Buy,66,0.0,4647.2,
 c88bd1ecf4ac,2026-04-29,19:55:00,Spread,Gold Option,OGZ6,call,C6500.00,Sell,200,6530.0,30.0,2026-11-24
@@ -158,9 +158,9 @@ e41624275152,2026-04-30,19:53:50,Spread,Gold Futures,GCQ6,futures,,Buy,36,0.0,46
 cc8d3ff428ba,2026-05-04,19:52:00,Spread,Gold Option,OGZ6,call,C5000.00,Sell,100,5199.9,199.9,2026-11-24
 cc8d3ff428ba,2026-05-04,19:52:00,Spread,Gold Option,OGZ6,put,P3400.00,Buy,100,3377.1,22.9,2026-11-24
 cc8d3ff428ba,2026-05-04,19:52:00,Spread,Gold Futures,GCZ6,futures,,Buy,40,0.0,4686.9,
-9c6b4d3f663f,2026-05-01,19:51:46,Spread,Gold Option,OGQ6,put,P4355.00,Buy,100,4265.8,89.2,2026-07-28
-9c6b4d3f663f,2026-05-01,19:51:46,Spread,Gold Option,OGQ6,call,C5085.00,Sell,100,5160.7,75.7,2026-07-28
 9c6b4d3f663f,2026-05-01,19:51:46,Spread,Gold Futures,GCQ6,futures,,Buy,44,0.0,4675.0,
+9c6b4d3f663f,2026-05-01,19:51:46,Spread,Gold Option,OGQ6,call,C5085.00,Sell,100,5160.7,75.7,2026-07-28
+9c6b4d3f663f,2026-05-01,19:51:46,Spread,Gold Option,OGQ6,put,P4355.00,Buy,100,4265.8,89.2,2026-07-28
 99a66f976c93,2026-04-28,19:41:41,Spread,Gold Option,OGQ6,put,P4635.00,Buy,100,4421.8,213.2,2026-07-28
 99a66f976c93,2026-04-28,19:41:41,Spread,Gold Futures,GCQ6,futures,,Buy,49,0.0,4612.4,
 0cb0b83086b3,2026-04-29,19:40:39,Spread,Gold Option,OGN6,call,C5100.00,Sell,80,5129.4,29.4,2026-06-25
@@ -170,10 +170,10 @@ cc8d3ff428ba,2026-05-04,19:52:00,Spread,Gold Futures,GCZ6,futures,,Buy,40,0.0,46
 1a5908d039b8,2026-05-01,19:40:21,Spread,Gold Option,OGM6,put,P4460.00,Buy,200,4414.5,45.5,2026-05-26
 55ccfa8d6303,2026-05-04,19:38:44,Spread,Silver Futures,SIN6,futures,,Sell,1,0.0,74.81,
 55ccfa8d6303,2026-05-04,19:38:44,Spread,Silver Weekly Tuesday Option - Week 1,S1TK6,call,C77.00,Buy,10,77.2,0.2,
-e71e10ca3400,2026-05-04,19:38:13,Spread,Silver Weekly Tuesday Option - Week 1,S1TK6,call,C77.00,Buy,10,77.2,0.2,
 e71e10ca3400,2026-05-04,19:38:13,Spread,Silver Futures,SIN6,futures,,Sell,1,0.0,74.81,
-757fc63d204c,2026-05-04,19:38:01,Spread,Silver Futures,SIN6,futures,,Sell,2,0.0,74.81,
+e71e10ca3400,2026-05-04,19:38:13,Spread,Silver Weekly Tuesday Option - Week 1,S1TK6,call,C77.00,Buy,10,77.2,0.2,
 757fc63d204c,2026-05-04,19:38:01,Spread,Silver Weekly Tuesday Option - Week 1,S1TK6,call,C77.00,Buy,15,77.2,0.2,
+757fc63d204c,2026-05-04,19:38:01,Spread,Silver Futures,SIN6,futures,,Sell,2,0.0,74.81,
 dea0f9b98b9a,2026-04-28,19:35:35,Spread,Silver Futures,SIN6,futures,,Buy,45,0.0,73.12,
 dea0f9b98b9a,2026-04-28,19:35:35,Spread,Silver Option,SON6,put,P68.00,Buy,150,64.93,3.07,
 da4b6fac9eb3,2026-04-27,19:27:17,Spread,Gold Futures,GCQ6,futures,,Sell,26,0.0,4741.4,
@@ -182,8 +182,8 @@ da4b6fac9eb3,2026-04-27,19:27:17,Spread,Gold Option,OGQ6,call,C4745.00,Buy,50,49
 e1b88b65a5fc,2026-04-27,19:27:17,Spread,Gold Futures,GCQ6,futures,,Sell,13,0.0,4741.4,
 31af30c566f3,2026-04-29,19:26:19,Spread,Gold Option,OGU6,call,C5100.00,Buy,20,5183.0,83.0,2026-08-26
 31af30c566f3,2026-04-29,19:26:19,Spread,Gold Option,OGN6,call,C5100.00,Sell,40,5129.4,29.4,2026-06-25
-5a6cf3c36590,2026-05-04,19:26:11,Spread,Gold Option,OGU6,call,C5200.00,Buy,100,5272.6,72.6,2026-08-26
 5a6cf3c36590,2026-05-04,19:26:11,Spread,Gold Option,OGU6,call,C5500.00,Sell,200,5541.1,41.1,2026-08-26
+5a6cf3c36590,2026-05-04,19:26:11,Spread,Gold Option,OGU6,call,C5200.00,Buy,100,5272.6,72.6,2026-08-26
 540ba0cf3a23,2026-05-04,19:23:48,Spread,Gold Option,OGN6,call,C5200.00,Buy,200,5223.5,23.5,2026-06-25
 540ba0cf3a23,2026-05-04,19:23:48,Spread,Gold Option,OGN6,call,C5500.00,Sell,400,5510.9,10.9,2026-06-25
 772e3f1a2b32,2026-05-01,19:23:08,Strip,Gold Futures,GCQ6,futures,,Buy,108,0.0,4684.0,
@@ -194,10 +194,10 @@ e1b88b65a5fc,2026-04-27,19:27:17,Spread,Gold Futures,GCQ6,futures,,Sell,13,0.0,4
 65ffefc9c0f6,2026-05-01,19:13:49,Spread,Gold Option,OGM6,put,P4300.00,Sell,200,4282.0,18.0,2026-05-26
 f45ec5778542,2026-04-30,19:11:49,Spread,Silver Option,SOQ6,put,P73.00,Buy,26,67.1,5.9,
 f45ec5778542,2026-04-30,19:11:49,Spread,Silver Futures,SIU6,futures,,Buy,11,0.0,73.97,
-0686867ef7da,2026-04-30,19:11:26,Spread,Silver Option,SOQ6,put,P73.00,Buy,31,67.1,5.9,
 0686867ef7da,2026-04-30,19:11:26,Spread,Silver Futures,SIU6,futures,,Buy,13,0.0,73.97,
-cb85d80e564c,2026-04-30,19:11:15,Spread,Silver Option,SOQ6,put,P73.00,Buy,26,67.1,5.9,
+0686867ef7da,2026-04-30,19:11:26,Spread,Silver Option,SOQ6,put,P73.00,Buy,31,67.1,5.9,
 cb85d80e564c,2026-04-30,19:11:15,Spread,Silver Futures,SIU6,futures,,Buy,11,0.0,73.97,
+cb85d80e564c,2026-04-30,19:11:15,Spread,Silver Option,SOQ6,put,P73.00,Buy,26,67.1,5.9,
 83a981e1d036,2026-04-30,19:11:02,Spread,Silver Futures,SIU6,futures,,Buy,11,0.0,73.97,
 83a981e1d036,2026-04-30,19:11:02,Spread,Silver Option,SOQ6,put,P73.00,Buy,26,67.1,5.9,
 04a5e3b9f6c6,2026-05-04,19:09:15,Spread,Gold Futures,GCM6,futures,,Buy,1,0.0,4573.9,
@@ -208,10 +208,10 @@ cb85d80e564c,2026-04-30,19:11:15,Spread,Silver Futures,SIU6,futures,,Buy,11,0.0,
 7d339b3b4c0f,2026-04-29,19:06:17,Spread,Gold Option,OGQ6,call,C4560.00,Buy,50,4768.5,208.5,2026-07-28
 7e51cd86c0fc,2026-05-04,19:03:33,Spread,Gold Option,OGQ6,put,P4605.00,Buy,50,4407.3,197.7,2026-07-28
 7e51cd86c0fc,2026-05-04,19:03:33,Spread,Gold Futures,GCQ6,futures,,Buy,24,0.0,4610.3,
+2f287f10dc05,2026-04-30,18:57:42,Spread,Silver Futures,SIZ6,futures,,Sell,13,0.0,75.225,
+2f287f10dc05,2026-04-30,18:57:42,Spread,Silver Option,SON6,call,C80.00,Buy,45,83.1,3.1,
 2f287f10dc05,2026-04-30,18:57:42,Spread,Silver Option,SOZ6,put,P65.00,Sell,45,60.25,4.75,
 2f287f10dc05,2026-04-30,18:57:42,Spread,Silver Futures,SIN6,futures,,Sell,14,0.0,74.0,
-2f287f10dc05,2026-04-30,18:57:42,Spread,Silver Option,SON6,call,C80.00,Buy,45,83.1,3.1,
-2f287f10dc05,2026-04-30,18:57:42,Spread,Silver Futures,SIZ6,futures,,Sell,13,0.0,75.225,
 c55d5c90308f,2026-04-30,18:57:33,Spread,Silver Option,SOZ6,put,P65.00,Sell,15,60.25,4.75,
 c55d5c90308f,2026-04-30,18:57:33,Spread,Silver Option,SON6,call,C80.00,Buy,15,83.1,3.1,
 c55d5c90308f,2026-04-30,18:57:33,Spread,Silver Futures,SIZ6,futures,,Sell,4,0.0,75.225,
@@ -220,9 +220,9 @@ bdbbd2187d39,2026-04-30,18:57:00,Spread,Silver Option,SOZ6,put,P65.00,Sell,15,60
 bdbbd2187d39,2026-04-30,18:57:00,Spread,Silver Futures,SIN6,futures,,Sell,5,0.0,74.0,
 bdbbd2187d39,2026-04-30,18:57:00,Spread,Silver Futures,SIZ6,futures,,Sell,4,0.0,75.225,
 bdbbd2187d39,2026-04-30,18:57:00,Spread,Silver Option,SON6,call,C80.00,Buy,15,83.1,3.1,
+adfe5c8b76a8,2026-04-28,18:53:00,Spread,Gold Futures,GCZ6,futures,,Buy,35,0.0,4711.0,
 adfe5c8b76a8,2026-04-28,18:53:00,Spread,Gold Option,OGX6,call,C5300.00,Sell,80,5415.5,115.5,2026-10-27
 adfe5c8b76a8,2026-04-28,18:53:00,Spread,Gold Option,OGX6,put,P4250.00,Buy,80,4125.0,125.0,2026-10-27
-adfe5c8b76a8,2026-04-28,18:53:00,Spread,Gold Futures,GCZ6,futures,,Buy,35,0.0,4711.0,
 34884b17ea38,2026-04-29,18:52:25,Spread,Silver Option,SON6,put,P67.00,Buy,75,64.03,2.97,
 34884b17ea38,2026-04-29,18:52:25,Spread,Silver Futures,SIN6,futures,,Buy,22,0.0,72.0,
 3048e896a395,2026-05-01,18:51:43,Spread,Silver Weekly Wednesday Option - Week 1,W1SK6,call,C78.00,Buy,20,78.74,0.74,
@@ -231,9 +231,9 @@ adfe5c8b76a8,2026-04-28,18:53:00,Spread,Gold Futures,GCZ6,futures,,Buy,35,0.0,47
 492353a6d890,2026-05-01,18:51:26,Spread,Silver Weekly Wednesday Option - Week 1,W1SK6,call,C78.00,Buy,15,78.74,0.74,
 44b102e10b79,2026-05-01,18:51:13,Spread,Silver Weekly Wednesday Option - Week 1,W1SK6,call,C78.00,Buy,15,78.74,0.74,
 44b102e10b79,2026-05-01,18:51:13,Spread,Silver Futures,SIN6,futures,,Sell,4,0.0,76.04,
-75cf48845b01,2026-04-30,18:50:52,Spread,Gold Futures,GCZ6,futures,,Buy,34,0.0,4740.7,
-75cf48845b01,2026-04-30,18:50:52,Spread,Gold Option,OGZ6,put,P3400.00,Sell,180,3376.3,23.7,2026-11-24
 75cf48845b01,2026-04-30,18:50:52,Spread,Gold Option,OGZ6,put,P4300.00,Buy,180,4149.3,150.7,2026-11-24
+75cf48845b01,2026-04-30,18:50:52,Spread,Gold Option,OGZ6,put,P3400.00,Sell,180,3376.3,23.7,2026-11-24
+75cf48845b01,2026-04-30,18:50:52,Spread,Gold Futures,GCZ6,futures,,Buy,34,0.0,4740.7,
 e13c86330c56,2026-04-29,18:49:24,Spread,Silver Option,SOM6,put,P63.75,Buy,100,63.24,0.51,
 e13c86330c56,2026-04-29,18:49:24,Spread,Silver Futures,SIN6,futures,,Buy,15,0.0,74.8,
 2aa7f6f7e729,2026-05-04,18:48:42,Spread,Gold Futures,GCQ6,futures,,Buy,46,0.0,4615.0,
@@ -243,10 +243,10 @@ e13c86330c56,2026-04-29,18:49:24,Spread,Silver Futures,SIN6,futures,,Buy,15,0.0,
 087b99e4302d,2026-04-30,18:48:32,Strip,Gold Futures,GCM6,futures,,Buy,21,0.0,4650.0,
 fb49806e1ac8,2026-04-30,18:45:58,Spread,Gold Option,OGQ6,call,C4700.00,Sell,200,4892.8,192.8,2026-07-28
 fb49806e1ac8,2026-04-30,18:45:58,Spread,Gold Option,OGQ6,call,C5525.00,Buy,550,5550.2,25.2,2026-07-28
-04244a924ad1,2026-04-29,18:45:08,Strip,Gold Weekly Thursday Option - Week 2,G2RK6,put,P4450.00,Buy,100,4396.0,54.0,2026-05-14
 04244a924ad1,2026-04-29,18:45:08,Strip,Gold Futures,GCM6,futures,,Buy,32,0.0,4545.0,
-aaf8fd56ab6f,2026-04-30,18:44:01,Strip,Gold Option,OGM6,put,P4600.00,Buy,100,4508.9,91.1,2026-05-26
+04244a924ad1,2026-04-29,18:45:08,Strip,Gold Weekly Thursday Option - Week 2,G2RK6,put,P4450.00,Buy,100,4396.0,54.0,2026-05-14
 aaf8fd56ab6f,2026-04-30,18:44:01,Strip,Gold Futures,GCM6,futures,,Buy,42,0.0,4650.0,
+aaf8fd56ab6f,2026-04-30,18:44:01,Strip,Gold Option,OGM6,put,P4600.00,Buy,100,4508.9,91.1,2026-05-26
 ce1267d1f30c,2026-04-29,18:32:08,Spread,Silver Option,SOM6,call,C90.00,Sell,35,90.28,0.283,
 ce1267d1f30c,2026-04-29,18:32:08,Spread,Silver Option,SOM6,call,C80.00,Buy,35,81.07,1.073,
 b30c2ad671c0,2026-04-27,18:30:26,Option,Gold Option,OGM6,put,P4500.00,,200,4456.5,43.5,2026-05-26
@@ -257,8 +257,8 @@ c1db4795a65d,2026-05-01,18:28:13,Strip,Gold Option,OGV6,put,P4200.00,Buy,50,4103
 6c27553163a7,2026-04-28,18:17:44,Spread,Gold Futures,GCZ6,futures,,Buy,22,0.0,4711.0,
 07d4e1b9051c,2026-05-04,18:00:32,Strip,Gold Futures,GCM6,futures,,Sell,38,0.0,4585.0,
 07d4e1b9051c,2026-05-04,18:00:32,Strip,Gold Option,OGM6,call,C4650.00,Buy,90,4726.5,76.5,2026-05-26
-8b8d2d0b4c99,2026-05-04,17:52:17,Strip,Gold Option,OGM6,call,C4650.00,Buy,50,4726.5,76.5,2026-05-26
 8b8d2d0b4c99,2026-05-04,17:52:17,Strip,Gold Futures,GCM6,futures,,Sell,21,0.0,4585.0,
+8b8d2d0b4c99,2026-05-04,17:52:17,Strip,Gold Option,OGM6,call,C4650.00,Buy,50,4726.5,76.5,2026-05-26
 72580122db68,2026-04-27,17:39:47,Strip,Gold Option,OGU6,call,C5400.00,Sell,50,5468.1,68.1,2026-08-26
 72580122db68,2026-04-27,17:39:47,Strip,Gold Option,OGU6,call,C4900.00,Buy,50,5093.6,193.6,2026-08-26
 72580122db68,2026-04-27,17:39:47,Strip,Gold Futures,GCV6,futures,,Sell,13,0.0,4788.0,
@@ -269,8 +269,8 @@ f98cb514fd94,2026-04-30,17:35:29,Spread,Gold Futures,GCM6,futures,,Sell,8,0.0,46
 6841ea858a41,2026-04-30,17:29:22,Spread,Silver Option,SOM6,put,P62.00,Buy,32,61.64,0.36,
 5dc2f36363be,2026-04-30,17:29:07,Spread,Silver Option,SOM6,put,P62.00,Buy,36,61.64,0.36,
 5dc2f36363be,2026-04-30,17:29:07,Spread,Silver Futures,SIN6,futures,,Buy,2,0.0,74.14,
-2a50aa30ea6e,2026-04-30,17:29:04,Spread,Silver Option,SOM6,put,P62.00,Buy,32,61.64,0.36,
 2a50aa30ea6e,2026-04-30,17:29:04,Spread,Silver Futures,SIN6,futures,,Buy,2,0.0,74.14,
+2a50aa30ea6e,2026-04-30,17:29:04,Spread,Silver Option,SOM6,put,P62.00,Buy,32,61.64,0.36,
 e550813828da,2026-04-28,17:27:18,Spread,Gold Futures,GCQ6,futures,,Buy,42,0.0,4630.0,
 e550813828da,2026-04-28,17:27:18,Spread,Gold Option,OGQ6,put,P4400.00,Buy,150,4289.0,111.0,2026-07-28
 f148158efb9f,2026-04-28,17:25:44,Spread,Gold Weekly Wednesday Option - Week 2,G2WK6,call,C4650.00,Buy,85,4708.5,58.5,2026-05-13
@@ -281,8 +281,8 @@ b9e521c15206,2026-04-28,17:25:07,Spread,Gold Futures,GCM6,futures,,Sell,5,0.0,45
 b9e521c15206,2026-04-28,17:25:07,Spread,Gold Weekly Wednesday Option - Week 2,G2WK6,call,C4650.00,Buy,15,4708.5,58.5,2026-05-13
 7db0943cb232,2026-04-29,17:23:51,Option,Gold Option,OGN6,call,C5500.00,,50,5508.6,8.6,2026-06-25
 70dbb344c2aa,2026-04-29,17:23:28,Option,Gold Option,OGN6,call,C5500.00,,100,5508.6,8.6,2026-06-25
-f7d661c87b82,2026-04-28,17:14:38,Spread,Gold Option,OGV6,call,C5200.00,Buy,50,5291.3,91.3,2026-09-24
 f7d661c87b82,2026-04-28,17:14:38,Spread,Gold Futures,GCV6,futures,,Sell,9,0.0,4644.0,
+f7d661c87b82,2026-04-28,17:14:38,Spread,Gold Option,OGV6,call,C5200.00,Buy,50,5291.3,91.3,2026-09-24
 978982770c40,2026-04-28,17:14:02,Spread,Gold Futures,GCV6,futures,,Sell,9,0.0,4644.0,
 978982770c40,2026-04-28,17:14:02,Spread,Gold Option,OGV6,call,C5200.00,Buy,50,5291.3,91.3,2026-09-24
 f6882ca27d4e,2026-04-29,17:10:36,Spread,Silver Option,SOU6,call,C90.00,Buy,100,93.2,3.2,
@@ -293,14 +293,14 @@ d5f439fa2d26,2026-04-27,17:05:02,Spread,Silver Weekly Friday Option - Week 1,SO1
 d5f439fa2d26,2026-04-27,17:05:02,Spread,Silver Futures,SIN6,futures,,Sell,13,0.0,76.2,
 be5518fadea9,2026-04-28,17:02:47,Spread,Gold Option,OGM6,call,C4900.00,Sell,50,4922.8,22.8,2026-05-26
 be5518fadea9,2026-04-28,17:02:47,Spread,Gold Option,OGM6,call,C4800.00,Buy,50,4841.1,41.1,2026-05-26
+487295377145,2026-04-28,17:01:36,Spread,Silver Option,SON6,call,C79.00,Sell,25,82.15,3.15,
 487295377145,2026-04-28,17:01:36,Spread,Silver Option,SON6,put,P69.00,Buy,25,65.4,3.6,
 487295377145,2026-04-28,17:01:36,Spread,Silver Futures,SIN6,futures,,Buy,18,0.0,72.69,
-487295377145,2026-04-28,17:01:36,Spread,Silver Option,SON6,call,C79.00,Sell,25,82.15,3.15,
+8574d787f8d9,2026-04-28,17:01:08,Spread,Silver Option,SON6,call,C79.00,Sell,25,82.15,3.15,
 8574d787f8d9,2026-04-28,17:01:08,Spread,Silver Futures,SIN6,futures,,Buy,17,0.0,72.69,
 8574d787f8d9,2026-04-28,17:01:08,Spread,Silver Option,SON6,put,P69.00,Buy,25,65.4,3.6,
-8574d787f8d9,2026-04-28,17:01:08,Spread,Silver Option,SON6,call,C79.00,Sell,25,82.15,3.15,
-d97dbf7f2826,2026-04-28,16:56:38,Strip,Gold Option,OGQ6,put,P4685.00,Sell,20,4439.0,246.0,2026-07-28
 d97dbf7f2826,2026-04-28,16:56:38,Strip,Gold Option,OGQ6,put,P4350.00,Buy,26,4243.0,107.0,2026-07-28
+d97dbf7f2826,2026-04-28,16:56:38,Strip,Gold Option,OGQ6,put,P4685.00,Sell,20,4439.0,246.0,2026-07-28
 fb66f1f4008a,2026-05-01,16:35:51,Strip,Silver Option,SON6,put,P60.00,Buy,25,59.28,0.72,
 fb66f1f4008a,2026-05-01,16:35:51,Strip,Silver Futures,SIN6,futures,,Buy,2,0.0,73.8,
 703e2df38df3,2026-04-30,16:33:36,Spread,Gold Option,OGM6,call,C5080.00,Sell,200,5093.7,13.7,2026-05-26
@@ -316,11 +316,11 @@ a87da3dc8ee4,2026-04-30,16:15:00,Spread,Gold Option,OGQ6,call,C4800.00,Buy,160,4
 91fcad76d49e,2026-04-28,16:08:44,Spread,Gold Futures,GCM6,futures,,Sell,26,0.0,4621.0,
 91fcad76d49e,2026-04-28,16:08:44,Spread,Gold Option,OGZ6,call,C5400.00,Buy,525,5512.9,112.9,2026-11-24
 91fcad76d49e,2026-04-28,16:08:44,Spread,Gold Option,OGZ6,call,C5600.00,Sell,525,5686.1,86.1,2026-11-24
-16828aa7f524,2026-05-01,16:08:20,Spread,Gold Futures,GCM6,futures,,Sell,16,0.0,4578.0,
 16828aa7f524,2026-05-01,16:08:20,Spread,Gold Option,OGU6,call,C5400.00,Buy,200,5451.7,51.7,2026-08-26
 16828aa7f524,2026-05-01,16:08:20,Spread,Gold Option,OGU6,call,C5900.00,Sell,200,5922.4,22.4,2026-08-26
-214bddd77e3c,2026-05-01,15:40:37,Spread,Gold Option,OGM6,call,C4650.00,Buy,75,4728.7,78.7,2026-05-26
+16828aa7f524,2026-05-01,16:08:20,Spread,Gold Futures,GCM6,futures,,Sell,16,0.0,4578.0,
 214bddd77e3c,2026-05-01,15:40:37,Spread,Gold Futures,GCM6,futures,,Sell,30,0.0,4577.0,
+214bddd77e3c,2026-05-01,15:40:37,Spread,Gold Option,OGM6,call,C4650.00,Buy,75,4728.7,78.7,2026-05-26
 43324b09ea9b,2026-04-28,15:30:56,Strip,Gold Futures,GCV6,futures,,Sell,9,0.0,4691.0,
 43324b09ea9b,2026-04-28,15:30:56,Strip,Gold Option,OGU6,call,C5300.00,Buy,50,5360.5,60.5,2026-08-26
 f16f86c51bc7,2026-05-01,15:30:46,Spread,Gold Futures,GCM6,futures,,Sell,74,0.0,4582.0,
@@ -329,9 +329,9 @@ d9fb7770d336,2026-05-01,15:00:55,Spread,Gold Option,OGN6,call,C5000.00,Buy,100,5
 d9fb7770d336,2026-05-01,15:00:55,Spread,Gold Option,OGM6,call,C4850.00,Buy,50,4878.7,28.7,2026-05-26
 d9fb7770d336,2026-05-01,15:00:55,Spread,Gold Option,OGN6,call,C4750.00,Sell,50,4856.2,106.2,2026-06-25
 d9fb7770d336,2026-05-01,15:00:55,Spread,Gold Option,OGM6,call,C5050.00,Sell,100,5061.7,11.7,2026-05-26
-db734c48941f,2026-05-01,14:55:53,Spread,Gold Futures,GCQ6,futures,,Buy,63,0.0,4612.0,
-db734c48941f,2026-05-01,14:55:53,Spread,Gold Option,OGQ6,put,P4300.00,Buy,150,4210.5,89.5,2026-07-28
 db734c48941f,2026-05-01,14:55:53,Spread,Gold Option,OGQ6,call,C5025.00,Sell,150,5096.7,71.7,2026-07-28
+db734c48941f,2026-05-01,14:55:53,Spread,Gold Option,OGQ6,put,P4300.00,Buy,150,4210.5,89.5,2026-07-28
+db734c48941f,2026-05-01,14:55:53,Spread,Gold Futures,GCQ6,futures,,Buy,63,0.0,4612.0,
 c20d05925b99,2026-04-28,14:45:00,Spread,Gold Option,OGZ6,call,C6500.00,Sell,175,6527.7,27.7,2026-11-24
 c20d05925b99,2026-04-28,14:45:00,Spread,Gold Option,OGZ6,call,C5500.00,Buy,175,5600.0,100.0,2026-11-24
 c20d05925b99,2026-04-28,14:45:00,Spread,Gold Futures,GCZ6,futures,,Sell,25,0.0,4727.0,
@@ -341,9 +341,9 @@ ee5681337ad9,2026-04-28,14:40:00,Spread,Gold Futures,GCQ6,futures,,Buy,4,0.0,467
 62e5ecc1e2d6,2026-04-29,14:36:00,Spread,Gold Futures,GCM6,futures,,Sell,2,0.0,4583.0,
 62e5ecc1e2d6,2026-04-29,14:36:00,Spread,Gold Option,OGM6,put,P4500.00,Sell,50,4423.0,77.0,2026-05-26
 62e5ecc1e2d6,2026-04-29,14:36:00,Spread,Gold Option,OGN6,put,P4450.00,Buy,50,4354.5,95.5,2026-06-25
-210b07ddcea5,2026-04-28,14:28:19,Strip,Gold Option,OGM6,put,P4200.00,Sell,200,4184.2,15.8,2026-05-26
 210b07ddcea5,2026-04-28,14:28:19,Strip,Gold Option,OGM6,put,P4300.00,Buy,150,4275.7,24.3,2026-05-26
 210b07ddcea5,2026-04-28,14:28:19,Strip,Gold Futures,GCM6,futures,,Buy,3,0.0,4636.0,
+210b07ddcea5,2026-04-28,14:28:19,Strip,Gold Option,OGM6,put,P4200.00,Sell,200,4184.2,15.8,2026-05-26
 a8ce635aac76,2026-04-29,14:23:32,Spread,Gold Futures,GCM6,futures,,Buy,44,0.0,4572.0,
 a8ce635aac76,2026-04-29,14:23:32,Spread,Gold Option,OGM6,put,P4380.00,Buy,100,4333.2,46.8,2026-05-26
 a8ce635aac76,2026-04-29,14:23:32,Spread,Gold Option,OGM6,call,C4775.00,Sell,100,4813.4,38.4,2026-05-26
@@ -354,8 +354,8 @@ a8ce635aac76,2026-04-29,14:23:32,Spread,Gold Option,OGM6,call,C4775.00,Sell,100,
 6ca0176afcde,2026-05-01,14:08:27,Spread,Gold Option,OGQ6,call,C5400.00,Sell,160,5430.0,30.0,2026-07-28
 a8548cf4c95e,2026-05-01,13:59:14,Spread,Gold Futures,GCM6,futures,,Buy,44,0.0,4577.0,
 a8548cf4c95e,2026-05-01,13:59:14,Spread,Gold Option,OGM6,put,P4550.00,Buy,100,4450.2,99.8,2026-05-26
-eef7f70e48b1,2026-04-28,13:49:00,Spread,Gold Futures,GCM6,futures,,Buy,23,0.0,4644.0,
 eef7f70e48b1,2026-04-28,13:49:00,Spread,Gold Weekly Wednesday Option - Week 3,G3WK6,put,P4625.00,Buy,50,4532.8,92.2,2026-05-20
+eef7f70e48b1,2026-04-28,13:49:00,Spread,Gold Futures,GCM6,futures,,Buy,23,0.0,4644.0,
 c2dd19c8ffb1,2026-04-28,13:46:03,Strip,Silver Futures,SIN6,futures,,Buy,3,0.0,73.8,
 c2dd19c8ffb1,2026-04-28,13:46:03,Strip,Silver Option,SOM6,put,P63.00,Buy,25,62.38,0.62,
 4c91fb7743c9,2026-04-30,13:29:41,Strip,Gold Futures,GCM6,futures,,Sell,19,0.0,4630.0,
@@ -366,11 +366,11 @@ c2dd19c8ffb1,2026-04-28,13:46:03,Strip,Silver Option,SOM6,put,P63.00,Buy,25,62.3
 8cba0fc00cf3,2026-05-01,13:20:28,Spread,Gold Option,OGM6,put,P4410.00,Buy,100,4363.5,46.5,2026-05-26
 8cba0fc00cf3,2026-05-01,13:20:28,Spread,Gold Futures,GCM6,futures,,Buy,44,0.0,4592.0,
 8cba0fc00cf3,2026-05-01,13:20:28,Spread,Gold Option,OGM6,call,C4800.00,Sell,100,4840.5,40.5,2026-05-26
-5de29757fb3c,2026-05-01,13:18:55,Spread,Gold Futures,GCQ6,futures,,Buy,88,0.0,4626.0,
-5de29757fb3c,2026-05-01,13:18:55,Spread,Gold Option,OGQ6,call,C5030.00,Sell,200,5103.8,73.8,2026-07-28
 5de29757fb3c,2026-05-01,13:18:55,Spread,Gold Option,OGQ6,put,P4305.00,Buy,200,4217.7,87.3,2026-07-28
-7d77cb810a84,2026-04-30,13:15:13,Strip,Silver Option,SOM6,put,P64.00,Buy,60,63.33,0.67,
+5de29757fb3c,2026-05-01,13:18:55,Spread,Gold Option,OGQ6,call,C5030.00,Sell,200,5103.8,73.8,2026-07-28
+5de29757fb3c,2026-05-01,13:18:55,Spread,Gold Futures,GCQ6,futures,,Buy,88,0.0,4626.0,
 7d77cb810a84,2026-04-30,13:15:13,Strip,Silver Futures,SIN6,futures,,Buy,7,0.0,73.3,
+7d77cb810a84,2026-04-30,13:15:13,Strip,Silver Option,SOM6,put,P64.00,Buy,60,63.33,0.67,
 1d07acc1209b,2026-05-01,13:11:04,Spread,Gold Option,OGQ6,put,P4305.00,Buy,200,4217.5,87.5,2026-07-28
 1d07acc1209b,2026-05-01,13:11:04,Spread,Gold Futures,GCQ6,futures,,Buy,88,0.0,4626.0,
 1d07acc1209b,2026-05-01,13:11:04,Spread,Gold Option,OGQ6,call,C5030.00,Sell,200,5104.0,74.0,2026-07-28
@@ -379,8 +379,8 @@ c0d815deec86,2026-04-28,13:05:28,Strip,Gold Futures,GCM6,futures,,Buy,21,0.0,464
 2bee9fc3056a,2026-05-01,13:04:41,Spread,Gold Option,OGM6,call,C4800.00,Sell,200,4840.3,40.3,2026-05-26
 2bee9fc3056a,2026-05-01,13:04:41,Spread,Gold Option,OGM6,put,P4410.00,Buy,200,4363.7,46.3,2026-05-26
 2bee9fc3056a,2026-05-01,13:04:41,Spread,Gold Futures,GCM6,futures,,Buy,88,0.0,4592.0,
-b9903be08636,2026-04-28,12:56:07,Strip,Gold Option,OGM6,put,P4600.00,Buy,50,4508.0,92.0,2026-05-26
 b9903be08636,2026-04-28,12:56:07,Strip,Gold Futures,GCM6,futures,,Buy,21,0.0,4647.0,
+b9903be08636,2026-04-28,12:56:07,Strip,Gold Option,OGM6,put,P4600.00,Buy,50,4508.0,92.0,2026-05-26
 9ea7257fd48e,2026-05-01,12:41:00,Spread,Silver Weekly Friday Option - Week 2,SO2K6,call,C76.00,Buy,50,76.91,0.91,
 9ea7257fd48e,2026-05-01,12:41:00,Spread,Silver Futures,SIN6,futures,,Sell,15,0.0,73.8,
 1baedb7f1f24,2026-04-29,12:40:31,Spread,Gold Futures,GCM6,futures,,Buy,3,0.0,4590.0,
