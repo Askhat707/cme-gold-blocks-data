@@ -1,5 +1,5 @@
-# scraper.py — рабочий оригинал + авто-дата, дозапись, фильтр экспирации, expiry_date
-import os, time, hashlib, pickle, re
+# scraper.py — рабочий оригинал + авто-дата, дозапись, фильтр экспирации, expiry_date, бэкап
+import os, time, hashlib, pickle, re, shutil
 from datetime import datetime, date, timedelta
 import pandas as pd
 import pytz
@@ -13,7 +13,6 @@ from selenium.common.exceptions import TimeoutException, NoSuchElementException
 from webdriver_manager.chrome import ChromeDriverManager
 
 # ========== НАСТРОЙКИ ==========
-# Автоматически подставляем вчерашнюю дату (CME публикует блок-трейды следующего дня)
 yesterday = (date.today() - timedelta(days=1)).strftime("%Y-%m-%d")
 URL = (
     "https://www.cmegroup.com/clearing/operations-and-deliveries/"
@@ -327,48 +326,35 @@ def parse_all_gold_options(driver):
     return records
 
 def parse_leg_row(cells, is_first_row_of_group):
-    """
-    Извлекает данные одной строки таблицы (ножки сделки).
-    is_first_row_of_group=True для строки, содержащей время и тип сделки.
-    """
     try:
         if is_first_row_of_group:
-            # Первая строка группы: 0-time, 1-type, 2-product, 3-sym, 4-net_price, 5-qty,
-            # 6-C/P&strike, 7-B/S, 8-price
             if len(cells) < 9:
                 return None
             product = cells[2]
             symbol = cells[3]
-            qty_str = cells[5]          # qty находится после net-price
-            strike_str = cells[6]       # C/P & Strike
-            b_s = cells[7].capitalize() # B/S
-            price_str = cells[8]        # Price
+            qty_str = cells[5]
+            strike_str = cells[6]
+            b_s = cells[7].capitalize()
+            price_str = cells[8]
         else:
-            # Дополнительная строка (может быть с net-price или без)
-            # Минимум 6 элементов: product, symbol, qty, strike, bs, price
             if len(cells) < 6:
                 return None
             product = cells[0]
             symbol = cells[1]
-            # Если ячеек 7, значит присутствует net-price (cells[2])
             if len(cells) >= 7 and cells[2].strip() != "":
-                # Формат: product, symbol, net-price, qty, strike, bs, price
                 qty_str = cells[3]
                 strike_str = cells[4]
                 b_s = cells[5].capitalize()
                 price_str = cells[6]
             else:
-                # Формат: product, symbol, qty, strike, bs, price (нет net-price)
                 qty_str = cells[2]
                 strike_str = cells[3]
                 b_s = cells[4].capitalize()
                 price_str = cells[5]
 
-        # Безопасное преобразование quantity и price
         quantity = int(qty_str) if qty_str.isdigit() else 1
         price = float(price_str) if re.match(r'^-?\d+(\.\d+)?$', price_str) else 0.0
 
-        # Определяем тип ноги (опцион или фьючерс)
         product_lower = product.lower()
         if "futures" in product_lower:
             option_type = "futures"
@@ -379,7 +365,7 @@ def parse_leg_row(cells, is_first_row_of_group):
             if strike_str and (strike_str[0] in ('C', 'P')):
                 option_type = "call" if strike_str[0] == 'C' else "put"
             else:
-                option_type = "futures"  # запасной вариант
+                option_type = "futures"
                 strike = ""
 
         return {
@@ -421,7 +407,14 @@ def main():
         else:
             new_records = parse_all_gold_options(driver)
 
-        # === Дозапись в CSV ===
+        # ========== 1. Резервное копирование ==========
+        if os.path.exists(CSV_FILE):
+            backup_timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            backup_name = f"data_backup_{backup_timestamp}.csv"
+            shutil.copy2(CSV_FILE, backup_name)
+            print(f"✅ Резервная копия сохранена: {backup_name}")
+
+        # ========== 2. Дозапись в CSV ==========
         cols_order = [
             "trade_id", "trade_date", "time_utc5", "type", "product_name",
             "symbol", "option_type", "strike", "position", "quantity",
@@ -429,7 +422,6 @@ def main():
         ]
         if os.path.exists(CSV_FILE):
             df_old = pd.read_csv(CSV_FILE)
-            # Если старый файл без колонки expiry_date, добавляем
             for col in cols_order:
                 if col not in df_old.columns:
                     df_old[col] = ""
@@ -441,12 +433,35 @@ def main():
             df_new = pd.DataFrame(new_records)[cols_order]
             df_combined = pd.concat([df_old, df_new], ignore_index=True)
             df_combined.drop_duplicates(subset=["trade_id", "symbol", "position"], inplace=True)
-            df_combined.sort_values(by=["time_utc5"], ascending=False, inplace=True)
-            print(f"✅ Добавлено {len(df_new)} записей, всего {len(df_combined)}.")
+            print(f"✅ Добавлено {len(df_new)} записей")
         else:
             df_combined = df_old
-            print("ℹ️ Нет новых записей, файл остаётся без изменений.")
+            print("ℹ️ Нет новых записей")
 
+        # ========== 3. Фильтрация просроченных сделок ==========
+        today = date.today()
+
+        def trade_is_active(group):
+            for expiry_str in group['expiry_date']:
+                if pd.isna(expiry_str) or str(expiry_str).strip() == '':
+                    return True
+                try:
+                    exp_date = datetime.strptime(str(expiry_str).strip(), "%Y-%m-%d").date()
+                    if exp_date >= today:
+                        return True
+                except ValueError:
+                    return True
+            return False
+
+        active_mask = df_combined.groupby('trade_id')['expiry_date'].transform(trade_is_active)
+        expired_count = df_combined[~active_mask]['trade_id'].nunique()
+        df_combined = df_combined[active_mask]
+
+        if expired_count > 0:
+            print(f"⛔ Удалено {expired_count} полностью просроченных сделок (все ноги истекли).")
+
+        df_combined.sort_values(by=["time_utc5"], ascending=False, inplace=True)
+        print(f"📊 Итого записей после фильтрации: {len(df_combined)}")
         df_combined.to_csv(CSV_FILE, index=False)
         print("Файл сохранён:", CSV_FILE)
 
