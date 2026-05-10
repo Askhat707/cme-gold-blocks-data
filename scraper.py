@@ -1,4 +1,4 @@
-# scraper.py — исключение Silver, новая логика экспирации, бэкап до изменений
+# scraper.py — полное исключение Silver, новая логика экспирации, бэкап до изменений
 import os, time, hashlib, pickle, re, shutil
 from datetime import datetime, date, timedelta
 import pandas as pd
@@ -432,7 +432,14 @@ def main():
             df_combined = df_old
             print("ℹ️ Нет новых записей")
 
-        # ---------- 3. НОВАЯ ЛОГИКА ЭКСПИРАЦИИ ----------
+        # ---------- 3. УДАЛЕНИЕ ВСЕХ SILVER (включая исторические) ----------
+        silver_mask = df_combined['product_name'].str.lower().str.contains('silver', na=False)
+        silver_count = silver_mask.sum()
+        if silver_count > 0:
+            df_combined = df_combined[~silver_mask]
+            print(f"🗑️ Удалено {silver_count} записей с Silver (очистка исторических данных).")
+
+        # ---------- 4. НОВАЯ ЛОГИКА ЭКСПИРАЦИИ ----------
         today = date.today()
 
         def group_is_valid(group: pd.DataFrame) -> bool:
@@ -468,7 +475,7 @@ def main():
         if expired_groups_removed > 0:
             print(f"⛔ Удалено {expired_groups_removed} полностью просроченных сделок (все опционы истекли).")
 
-        # ---------- 4. СОХРАНЕНИЕ ----------
+        # ---------- 5. СОХРАНЕНИЕ ----------
         df_combined.sort_values(by=["time_utc5"], ascending=False, inplace=True)
         print(f"📊 Итого записей после фильтрации: {len(df_combined)}")
         df_combined.to_csv(CSV_FILE, index=False)
