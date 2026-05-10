@@ -1,4 +1,4 @@
-# scraper.py — рабочий оригинал + авто-дата, дозапись, фильтр экспирации, expiry_date, бэкап
+# scraper.py — исключение Silver, новая логика экспирации, бэкап до изменений
 import os, time, hashlib, pickle, re, shutil
 from datetime import datetime, date, timedelta
 import pandas as pd
@@ -26,7 +26,7 @@ CSV_FILE = "data.csv"
 CT_TZ = pytz.timezone("US/Central")
 TARGET_TZ = pytz.timezone("Asia/Almaty")  # UTC+5
 
-# ========== КАЛЕНДАРЬ ЭКСПИРАЦИЙ (Gold Options) ==========
+# ========== КАЛЕНДАРЬ ЭКСПИРАЦИЙ (только Gold Options) ==========
 EXPIRY_DATES = {
     "OGM6": "2026-05-26",
     "OGN6": "2026-06-25",
@@ -269,25 +269,18 @@ def parse_all_gold_options(driver):
         })
 
     print(f"Групп сделок до фильтрации: {len(trades)}")
-    today = date.today()
     for trade in trades:
         if not trade["legs"]:
             continue
-        # Проверяем, не истекли ли опционы в сделке
-        skip = False
+
+        # ---------- ПОЛНОЕ ИСКЛЮЧЕНИЕ SILVER ----------
+        silver_detected = False
         for leg in trade["legs"]:
-            sym = leg.get("symbol", "")
-            expiry_str = EXPIRY_DATES.get(sym)
-            if expiry_str:
-                try:
-                    expiry_date = datetime.strptime(expiry_str, "%Y-%m-%d").date()
-                    if expiry_date < today:
-                        skip = True
-                        print(f"⛔ Пропущена сделка с {sym} (экспирация {expiry_str})")
-                        break
-                except:
-                    pass
-        if skip:
+            if "silver" in leg.get("product_name", "").lower():
+                silver_detected = True
+                break
+        if silver_detected:
+            print(f"⛔ Пропущена сделка с Silver (время {trade['time']})")
             continue
 
         trade_id = generate_trade_id(trade_date, trade["time"], trade["type"], trade["legs"])
@@ -322,7 +315,7 @@ def parse_all_gold_options(driver):
                 "breakeven": breakeven,
                 "expiry_date": expiry_date_str,
             })
-    print(f"Записей после фильтрации: {len(records)}")
+    print(f"Записей после исключения Silver: {len(records)}")
     return records
 
 def parse_leg_row(cells, is_first_row_of_group):
@@ -384,6 +377,14 @@ def parse_leg_row(cells, is_first_row_of_group):
 def main():
     print("Запуск скрейпера CME Block Trades...")
     print("Дата для запроса:", URL.split("tradeDate=")[1].split("&")[0])
+
+    # ---------- 1. ОБЯЗАТЕЛЬНЫЙ БЭКАП ДО ЛЮБЫХ ИЗМЕНЕНИЙ ----------
+    if os.path.exists(CSV_FILE):
+        backup_timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        backup_name = f"data_backup_{backup_timestamp}.csv"
+        shutil.copy2(CSV_FILE, backup_name)
+        print(f"✅ Резервная копия сохранена: {backup_name}")
+
     driver = create_driver()
     try:
         driver.get(URL)
@@ -407,14 +408,7 @@ def main():
         else:
             new_records = parse_all_gold_options(driver)
 
-        # ========== 1. Резервное копирование ==========
-        if os.path.exists(CSV_FILE):
-            backup_timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-            backup_name = f"data_backup_{backup_timestamp}.csv"
-            shutil.copy2(CSV_FILE, backup_name)
-            print(f"✅ Резервная копия сохранена: {backup_name}")
-
-        # ========== 2. Дозапись в CSV ==========
+        # ---------- 2. ЗАГРУЗКА И ОБЪЕДИНЕНИЕ ДАННЫХ ----------
         cols_order = [
             "trade_id", "trade_date", "time_utc5", "type", "product_name",
             "symbol", "option_type", "strike", "position", "quantity",
@@ -438,28 +432,43 @@ def main():
             df_combined = df_old
             print("ℹ️ Нет новых записей")
 
-        # ========== 3. Фильтрация просроченных сделок ==========
+        # ---------- 3. НОВАЯ ЛОГИКА ЭКСПИРАЦИИ ----------
         today = date.today()
 
-        def trade_is_active(group):
-            for expiry_str in group['expiry_date']:
-                if pd.isna(expiry_str) or str(expiry_str).strip() == '':
-                    return True
+        def group_is_valid(group: pd.DataFrame) -> bool:
+            """
+            Возвращает True, если группу trade_id нужно сохранить.
+            - Если есть хоть одна опционная дата >= сегодня → сохранить.
+            - Если все опционные даты в прошлом → удалить (даже при наличии фьючерсов).
+            - Если опционных дат вообще нет → сохранить (только фьючерсы).
+            """
+            # все непустые значения expiry_date
+            expiry_series = group['expiry_date'].dropna()
+            expiry_series = expiry_series[expiry_series != '']
+            if len(expiry_series) == 0:
+                # нет опционных дат → чистые фьючерсы → сохраняем
+                return True
+            # проверяем, есть ли хотя бы одна дата >= сегодня
+            for exp_str in expiry_series:
                 try:
-                    exp_date = datetime.strptime(str(expiry_str).strip(), "%Y-%m-%d").date()
+                    exp_date = datetime.strptime(str(exp_str).strip(), "%Y-%m-%d").date()
                     if exp_date >= today:
                         return True
                 except ValueError:
-                    return True
+                    # битая дата — считаем, что не продлевает жизнь сделке
+                    pass
             return False
 
-        active_mask = df_combined.groupby('trade_id')['expiry_date'].transform(trade_is_active)
-        expired_count = df_combined[~active_mask]['trade_id'].nunique()
-        df_combined = df_combined[active_mask]
+        # получаем список допустимых trade_id
+        valid_ids = df_combined.groupby('trade_id').filter(group_is_valid)['trade_id'].unique()
+        total_groups_before = df_combined['trade_id'].nunique()
+        df_combined = df_combined[df_combined['trade_id'].isin(valid_ids)]
+        total_groups_after = df_combined['trade_id'].nunique()
+        expired_groups_removed = total_groups_before - total_groups_after
+        if expired_groups_removed > 0:
+            print(f"⛔ Удалено {expired_groups_removed} полностью просроченных сделок (все опционы истекли).")
 
-        if expired_count > 0:
-            print(f"⛔ Удалено {expired_count} полностью просроченных сделок (все ноги истекли).")
-
+        # ---------- 4. СОХРАНЕНИЕ ----------
         df_combined.sort_values(by=["time_utc5"], ascending=False, inplace=True)
         print(f"📊 Итого записей после фильтрации: {len(df_combined)}")
         df_combined.to_csv(CSV_FILE, index=False)
